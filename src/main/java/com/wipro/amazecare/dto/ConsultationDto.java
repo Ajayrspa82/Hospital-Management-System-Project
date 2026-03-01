@@ -19,10 +19,9 @@ public class ConsultationDto {
 
     private LocalDateTime consultationDate;
 
-    // List of prescriptions (if multiple medicines are prescribed)
+    
     private List<PrescriptionDto> prescriptions;
 
-    // List of recommended medical tests
     private List<MedicalTestDto> recommendedTests;
 
     public ConsultationDto() {

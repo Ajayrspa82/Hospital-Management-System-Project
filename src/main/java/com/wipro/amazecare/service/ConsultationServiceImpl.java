@@ -3,6 +3,7 @@
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.ConsultationDto;
@@ -18,28 +19,22 @@ import com.wipro.amazecare.repository.PatientRepository;
 @Service
 public class ConsultationServiceImpl implements ConsultationService {
 
-    private final ConsultationRepository repository;
-    private final PatientRepository patientRepository;
-    private final DoctorRepository doctorRepository;
+    @Autowired
+    private ConsultationRepository repository;
 
-    // Constructor injection
-    public ConsultationServiceImpl(ConsultationRepository repository,
-                                   PatientRepository patientRepository,
-                                   DoctorRepository doctorRepository) {
-        this.repository = repository;
-        this.patientRepository = patientRepository;
-        this.doctorRepository = doctorRepository;
-    }
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     @Override
     public ConsultationDto createConsultation(ConsultationDto dto) {
 
-        // Validate input
-        if(dto.getSymptoms() == null || dto.getSymptoms().isEmpty()) {
+        if (dto.getSymptoms() == null || dto.getSymptoms().isBlank()) {
             throw new BadRequestException("Symptoms cannot be empty");
         }
 
-        // Fetch Patient and Doctor
         Patient patient = patientRepository.findById(dto.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Patient not found with id: " + dto.getPatientId()));
@@ -48,10 +43,9 @@ public class ConsultationServiceImpl implements ConsultationService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Doctor not found with id: " + dto.getDoctorId()));
 
-        // Create Consultation
         Consultation consultation = new Consultation();
-        consultation.setPatient(patient);  
-        consultation.setDoctor(doctor);    
+        consultation.setPatient(patient);
+        consultation.setDoctor(doctor);
         consultation.setSymptoms(dto.getSymptoms());
         consultation.setPhysicalExamination(dto.getPhysicalExamination());
         consultation.setTreatmentPlan(dto.getTreatmentPlan());
@@ -59,8 +53,7 @@ public class ConsultationServiceImpl implements ConsultationService {
 
         repository.save(consultation);
 
-        dto.setConsultationId(consultation.getConsultationId());
-        return dto;
+        return mapToDto(consultation);
     }
 
     @Override
@@ -70,22 +63,15 @@ public class ConsultationServiceImpl implements ConsultationService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Consultation not found with id: " + id));
 
-        ConsultationDto dto = new ConsultationDto();
-        dto.setConsultationId(consultation.getConsultationId());
-        dto.setPatientId(consultation.getPatient().getPatientId());
-        dto.setDoctorId(consultation.getDoctor().getDoctorId());
-        dto.setSymptoms(consultation.getSymptoms());
-        dto.setPhysicalExamination(consultation.getPhysicalExamination());
-        dto.setTreatmentPlan(consultation.getTreatmentPlan());
-        dto.setConsultationDate(consultation.getConsultationDate());
-
-        return dto;
+        return mapToDto(consultation);
     }
 
     @Override
     public List<ConsultationDto> getAllConsultations() {
-        return repository.findAll().stream()
-                .map(c -> getConsultationById(c.getConsultationId()))
+
+        return repository.findAll()
+                .stream()
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
@@ -96,30 +82,25 @@ public class ConsultationServiceImpl implements ConsultationService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Consultation not found with id: " + id));
 
-        if(dto.getSymptoms() != null && !dto.getSymptoms().isEmpty()) {
+        if (dto.getSymptoms() != null && !dto.getSymptoms().isBlank()) {
             consultation.setSymptoms(dto.getSymptoms());
         }
 
-        if(dto.getPhysicalExamination() != null) {
+        if (dto.getPhysicalExamination() != null) {
             consultation.setPhysicalExamination(dto.getPhysicalExamination());
         }
 
-        if(dto.getTreatmentPlan() != null) {
+        if (dto.getTreatmentPlan() != null) {
             consultation.setTreatmentPlan(dto.getTreatmentPlan());
         }
 
-        if(dto.getConsultationDate() != null) {
+        if (dto.getConsultationDate() != null) {
             consultation.setConsultationDate(dto.getConsultationDate());
         }
 
         repository.save(consultation);
 
-        // Update DTO to reflect saved entity
-        dto.setConsultationId(consultation.getConsultationId());
-        dto.setPatientId(consultation.getPatient().getPatientId());
-        dto.setDoctorId(consultation.getDoctor().getDoctorId());
-
-        return dto;
+        return mapToDto(consultation);
     }
 
     @Override
@@ -130,5 +111,19 @@ public class ConsultationServiceImpl implements ConsultationService {
                         "Consultation not found with id: " + id));
 
         repository.delete(consultation);
+    }
+
+    private ConsultationDto mapToDto(Consultation c) {
+
+        ConsultationDto dto = new ConsultationDto();
+        dto.setConsultationId(c.getConsultationId());
+        dto.setPatientId(c.getPatient().getPatientId());
+        dto.setDoctorId(c.getDoctor().getDoctorId());
+        dto.setSymptoms(c.getSymptoms());
+        dto.setPhysicalExamination(c.getPhysicalExamination());
+        dto.setTreatmentPlan(c.getTreatmentPlan());
+        dto.setConsultationDate(c.getConsultationDate());
+
+        return dto;
     }
 }
