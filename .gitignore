@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+# Eclipse Workspace (IMPORTANT)
+.metadata/
+bin/
