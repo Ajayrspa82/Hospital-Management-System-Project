@@ -2,22 +2,24 @@ package com.wipro.amazecare.service;
 
 
 
-import com.wipro.amazecare.dto.*;
+
+
 import java.util.List;
+import com.wipro.amazecare.dto.*;
 
 public interface AppointmentService {
 
-    AppointmentResponseDto bookAppointment(AppointmentRequestDto request);
+    AppointmentResponseDto bookAppointment(AppointmentRequestDto dto);
 
-    AppointmentResponseDto getAppointmentById(Long appointmentId);
+    AppointmentResponseDto cancelAppointment(Long id);
+
+    AppointmentResponseDto rescheduleAppointment(Long id, AppointmentUpdateDto dto);
+
+    AppointmentResponseDto approveAppointment(Long id);
+
+    AppointmentResponseDto rejectAppointment(Long id);
+
+    AppointmentResponseDto getAppointmentById(Long id);
 
     List<AppointmentResponseDto> getAllAppointments();
-
-    AppointmentResponseDto cancelAppointment(Long appointmentId);
-
-    AppointmentResponseDto rescheduleAppointment(Long appointmentId, AppointmentUpdateDto dto);
-
-    AppointmentResponseDto approveAppointment(Long appointmentId);
-
-    AppointmentResponseDto rejectAppointment(Long appointmentId);
 }

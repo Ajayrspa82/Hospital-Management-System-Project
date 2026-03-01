@@ -1,44 +1,52 @@
 package com.wipro.amazecare.entity;
 
-
-
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "appointments")
 public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long appointmentId;
 
-    private LocalDate appointmentDate;
+    @ManyToOne
+    @JoinColumn(name="doctor_id")
+    private Doctor doctor;
+
+    @ManyToOne
+    @JoinColumn(name="patient_id")
+    private Patient patient;
+
+    private LocalDateTime appointmentDate;
+
     private String reason;
-    private String status; // status stored as string
 
-    @Column(name = "patient_id")
-    private Long patientId;
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus status;
 
-    @Column(name = "doctor_id")
-    private Long doctorId;
+    private boolean cancelled;
 
-    // Getters and Setters
+    // GETTERS + SETTERS
+
     public Long getAppointmentId() { return appointmentId; }
     public void setAppointmentId(Long appointmentId) { this.appointmentId = appointmentId; }
 
-    public LocalDate getAppointmentDate() { return appointmentDate; }
-    public void setAppointmentDate(LocalDate appointmentDate) { this.appointmentDate = appointmentDate; }
+    public Doctor getDoctor() { return doctor; }
+    public void setDoctor(Doctor doctor) { this.doctor = doctor; }
+
+    public Patient getPatient() { return patient; }
+    public void setPatient(Patient patient) { this.patient = patient; }
+
+    public LocalDateTime getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(LocalDateTime appointmentDate) { this.appointmentDate = appointmentDate; }
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public AppointmentStatus getStatus() { return status; }
+    public void setStatus(AppointmentStatus status) { this.status = status; }
 
-    public Long getPatientId() { return patientId; }
-    public void setPatientId(Long patientId) { this.patientId = patientId; }
-
-    public Long getDoctorId() { return doctorId; }
-    public void setDoctorId(Long doctorId) { this.doctorId = doctorId; }
+    public boolean isCancelled() { return cancelled; }
+    public void setCancelled(boolean cancelled) { this.cancelled = cancelled; }
 }
