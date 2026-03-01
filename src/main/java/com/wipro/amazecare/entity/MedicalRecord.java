@@ -10,38 +10,45 @@ public class MedicalRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recordId;
 
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+
     @OneToOne
-    @JoinColumn(name = "consultation_id", nullable = false)
+    @JoinColumn(name = "consultation_id")
     private Consultation consultation;
 
-    @Column(length = 2000)
     private String notes;
 
-	public Long getRecordId() {
-		return recordId;
-	}
+    public Long getRecordId() {
+        return recordId;
+    }
 
-	public void setRecordId(Long recordId) {
-		this.recordId = recordId;
-	}
+    public void setRecordId(Long recordId) {
+        this.recordId = recordId;
+    }
 
-	public Consultation getConsultation() {
-		return consultation;
-	}
+    public Patient getPatient() {
+        return patient;
+    }
 
-	public void setConsultation(Consultation consultation) {
-		this.consultation = consultation;
-	}
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
 
-	public String getNotes() {
-		return notes;
-	}
+    public Consultation getConsultation() {
+        return consultation;
+    }
 
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
+    public void setConsultation(Consultation consultation) {
+        this.consultation = consultation;
+    }
 
-    // Getters and Setters
-    
-    
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 }
