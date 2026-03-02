@@ -8,43 +8,36 @@ import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.PrescriptionDto;
 import com.wipro.amazecare.entity.Prescription;
-import com.wipro.amazecare.entity.Consultation;
 import com.wipro.amazecare.exception.ResourceNotFoundException;
 import com.wipro.amazecare.repository.PrescriptionRepository;
-import com.wipro.amazecare.repository.ConsultationRepository;
 
 @Service
 public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Autowired
-    private PrescriptionRepository repository;
-
-    @Autowired
-    private ConsultationRepository consultationRepository;
+    private PrescriptionRepository prescriptionRepository;
 
     @Override
     public PrescriptionDto addPrescription(PrescriptionDto dto) {
-
-        Consultation consultation = consultationRepository.findById(dto.getConsultationId())
-                .orElseThrow(() -> new ResourceNotFoundException("Consultation not found"));
-
         Prescription prescription = new Prescription();
-        prescription.setConsultation(consultation);
+        // map DTO to entity
         prescription.setMedicineName(dto.getMedicineName());
         prescription.setDosage(dto.getDosage());
         prescription.setDurationDays(dto.getDurationDays());
+        // here, make sure consultation is set in controller/service layer
+        // prescription.setConsultation(...);
 
-        repository.save(prescription);
-
+        prescriptionRepository.save(prescription);
         dto.setPrescriptionId(prescription.getPrescriptionId());
         return dto;
     }
 
     @Override
     public List<PrescriptionDto> getPrescriptionsByConsultation(Long consultationId) {
+        List<Prescription> prescriptions = prescriptionRepository
+                .findByConsultation_ConsultationId(consultationId);
 
-        return repository.findByConsultation_ConsultationId(consultationId)
-                .stream()
+        return prescriptions.stream()
                 .map(p -> {
                     PrescriptionDto dto = new PrescriptionDto();
                     dto.setPrescriptionId(p.getPrescriptionId());
@@ -55,5 +48,43 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deletePrescription(Long id) {
+        Prescription prescription = prescriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Prescription not found with id: " + id));
+        prescriptionRepository.delete(prescription);
+    }
+
+    @Override
+    public PrescriptionDto updatePrescription(Long id, PrescriptionDto dto) {
+        Prescription prescription = prescriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Prescription not found with id: " + id));
+
+        if (dto.getMedicineName() != null) prescription.setMedicineName(dto.getMedicineName());
+        if (dto.getDosage() != null) prescription.setDosage(dto.getDosage());
+        if (dto.getDurationDays() > 0) prescription.setDurationDays(dto.getDurationDays());
+
+        prescriptionRepository.save(prescription);
+
+        dto.setPrescriptionId(prescription.getPrescriptionId());
+        return dto;
+    }
+
+    @Override
+    public PrescriptionDto getPrescriptionById(Long id) {
+        Prescription prescription = prescriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Prescription not found with id: " + id));
+        PrescriptionDto dto = new PrescriptionDto();
+        dto.setPrescriptionId(prescription.getPrescriptionId());
+        dto.setConsultationId(prescription.getConsultation().getConsultationId());
+        dto.setMedicineName(prescription.getMedicineName());
+        dto.setDosage(prescription.getDosage());
+        dto.setDurationDays(prescription.getDurationDays());
+        return dto;
     }
 }

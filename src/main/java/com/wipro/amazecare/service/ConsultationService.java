@@ -14,4 +14,8 @@ public interface ConsultationService {
     ConsultationDto updateConsultation(Long id, ConsultationDto dto);
 
     void deleteConsultation(Long id);
+    
+    List<ConsultationDto> getByPatient(Long patientId);
+
+    List<ConsultationDto> getByDoctor(Long doctorId);
 }
