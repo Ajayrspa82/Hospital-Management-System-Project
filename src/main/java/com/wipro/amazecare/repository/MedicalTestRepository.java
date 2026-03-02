@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface MedicalTestRepository extends JpaRepository<MedicalTest, Long> {
 
-    List<MedicalTest> findByConsultationId(Long consultationId);
+    // Use property traversal to fetch by consultationId
+    List<MedicalTest> findByConsultation_ConsultationId(Long consultationId);
 }
