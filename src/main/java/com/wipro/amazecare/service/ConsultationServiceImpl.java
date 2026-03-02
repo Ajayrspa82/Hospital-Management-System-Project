@@ -1,4 +1,4 @@
- package com.wipro.amazecare.service;
+package com.wipro.amazecare.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,6 +76,34 @@ public class ConsultationServiceImpl implements ConsultationService {
     }
 
     @Override
+    public List<ConsultationDto> getByPatient(Long patientId) {
+
+        if (!patientRepository.existsById(patientId)) {
+            throw new ResourceNotFoundException(
+                    "Patient not found with id: " + patientId);
+        }
+
+        return repository.findByPatient_PatientId(patientId)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ConsultationDto> getByDoctor(Long doctorId) {
+
+        if (!doctorRepository.existsById(doctorId)) {
+            throw new ResourceNotFoundException(
+                    "Doctor not found with id: " + doctorId);
+        }
+
+        return repository.findByDoctor_DoctorId(doctorId)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ConsultationDto updateConsultation(Long id, ConsultationDto dto) {
 
         Consultation consultation = repository.findById(id)
@@ -112,6 +140,7 @@ public class ConsultationServiceImpl implements ConsultationService {
 
         repository.delete(consultation);
     }
+
 
     private ConsultationDto mapToDto(Consultation c) {
 
