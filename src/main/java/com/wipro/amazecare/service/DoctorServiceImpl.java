@@ -3,6 +3,7 @@ package com.wipro.amazecare.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.DoctorDto;
@@ -14,67 +15,101 @@ import com.wipro.amazecare.repository.SpecializationRepository;
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
-    private final DoctorRepository doctorRepository;
-    private final SpecializationRepository specializationRepository;
+    @Autowired
+    private DoctorRepository doctorRepository;
 
-    public DoctorServiceImpl(DoctorRepository doctorRepository,
-                             SpecializationRepository specializationRepository) {
-        this.doctorRepository = doctorRepository;
-        this.specializationRepository = specializationRepository;
-    }
+    @Autowired
+    private SpecializationRepository specializationRepository;
 
     @Override
     public DoctorDto createDoctor(DoctorDto dto) {
-        Specialization specialization =
-                specializationRepository.findById(dto.getSpecializationId()).orElseThrow();
 
-        Doctor doctor = new Doctor();
+        Specialization specialization = specializationRepository
+                .findById(dto.getSpecializationId())
+                .orElseThrow(() -> new RuntimeException("Specialization not found"));
+
+        Doctor doctor = mapToEntity(dto);
+        doctor.setSpecialization(specialization);
+
+        Doctor savedDoctor = doctorRepository.save(doctor);
+
+        return mapToDto(savedDoctor);
+    }
+
+    @Override
+    public DoctorDto getDoctorById(Long id) {
+
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + id));
+
+        return mapToDto(doctor);
+    }
+
+    @Override
+    public List<DoctorDto> getAllDoctors() {
+
+        return doctorRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public DoctorDto updateDoctor(Long id, DoctorDto dto) {
+
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + id));
+
+        Specialization specialization = specializationRepository
+                .findById(dto.getSpecializationId())
+                .orElseThrow(() -> new RuntimeException("Specialization not found"));
+
         doctor.setName(dto.getName());
         doctor.setQualification(dto.getQualification());
         doctor.setExperience(dto.getExperience());
         doctor.setDesignation(dto.getDesignation());
         doctor.setSpecialization(specialization);
 
-        doctorRepository.save(doctor);
-        dto.setDoctorId(doctor.getDoctorId());
-        return dto;
+        Doctor updated = doctorRepository.save(doctor);
+
+        return mapToDto(updated);
     }
 
     @Override
-    public DoctorDto getDoctorById(Long doctorId) {
-        Doctor doctor = doctorRepository.findById(doctorId).orElseThrow();
+    public void deleteDoctor(Long id) {
+
+        if (!doctorRepository.existsById(id)) {
+            throw new RuntimeException("Doctor not found with id " + id);
+        }
+
+        doctorRepository.deleteById(id);
+    }
+
+    // ===== Mapping Methods =====
+
+    private DoctorDto mapToDto(Doctor doctor) {
+
         DoctorDto dto = new DoctorDto();
         dto.setDoctorId(doctor.getDoctorId());
         dto.setName(doctor.getName());
         dto.setQualification(doctor.getQualification());
         dto.setExperience(doctor.getExperience());
         dto.setDesignation(doctor.getDesignation());
+
         dto.setSpecializationId(doctor.getSpecialization().getSpecializationId());
         dto.setSpecializationName(doctor.getSpecialization().getSpecializationName());
+
         return dto;
     }
 
-    @Override
-    public List<DoctorDto> getAllDoctors() {
-        return doctorRepository.findAll().stream()
-                .map(d -> getDoctorById(d.getDoctorId()))
-                .collect(Collectors.toList());
-    }
+    private Doctor mapToEntity(DoctorDto dto) {
 
-    @Override
-    public DoctorDto updateDoctor(Long doctorId, DoctorDto dto) {
-        Doctor doctor = doctorRepository.findById(doctorId).orElseThrow();
+        Doctor doctor = new Doctor();
         doctor.setName(dto.getName());
         doctor.setQualification(dto.getQualification());
         doctor.setExperience(dto.getExperience());
         doctor.setDesignation(dto.getDesignation());
-        doctorRepository.save(doctor);
-        return dto;
-    }
-
-    @Override
-    public void deleteDoctor(Long doctorId) {
-        doctorRepository.deleteById(doctorId);
+        return doctor;
     }
 
 	@Override

@@ -1,5 +1,6 @@
 package com.wipro.amazecare.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,14 +17,19 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long doctorId;
 
+    @Column(nullable = false)
     private String name;
+
     private String qualification;
     private int experience;
     private String designation;
 
+    // Many Doctors belong to one Specialization
     @ManyToOne
-    @JoinColumn(name = "specialization_id")
+    @JoinColumn(name = "specialization_id", nullable = false)
     private Specialization specialization;
+
+    // Getters and Setters
 
     public Long getDoctorId() {
         return doctorId;
