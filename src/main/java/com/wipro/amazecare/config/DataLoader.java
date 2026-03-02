@@ -11,13 +11,15 @@ import com.wipro.amazecare.repository.RoleRepository;
 import com.wipro.amazecare.repository.UserRepository;
 import com.wipro.amazecare.repository.AdminRepository;
 
+import java.util.Optional;
+
 @Component
 public class DataLoader implements CommandLineRunner {
 
-    private RoleRepository roleRepository;
-    private UserRepository userRepository;
-    private AdminRepository adminRepository;
-    private PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataLoader(RoleRepository roleRepository,
                       UserRepository userRepository,
@@ -33,17 +35,20 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (roleRepository.findByName("ROLE_ADMIN").isEmpty()) {
-            roleRepository.save(new Role("ROLE_ADMIN"));
-        }
+        createRoleIfNotFound("ROLE_ADMIN");
+        createRoleIfNotFound("ROLE_DOCTOR");
+        createRoleIfNotFound("ROLE_PATIENT");
 
-        if (userRepository. findByEmail("admin").isEmpty()) {
+        
+        if (userRepository.findByEmail("admin@amazecare.com").isEmpty()) {
 
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN").get();
+            Role adminRole = roleRepository
+                    .findByName("ROLE_ADMIN")
+                    .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
 
             User user = new User();
-            user.setEmail("admin");
-            user.setPassword(passwordEncoder.encode("admin123")); // 🔐 ENCRYPTED
+            user.setEmail("admin@amazecare.com");
+            user.setPassword(passwordEncoder.encode("admin123"));
             user.setRole(adminRole);
 
             User savedUser = userRepository.save(user);
@@ -54,6 +59,15 @@ public class DataLoader implements CommandLineRunner {
             adminRepository.save(admin);
 
             System.out.println("Default Admin Created!");
+        }
+    }
+    private void createRoleIfNotFound(String roleName) {
+
+        Optional<Role> role = roleRepository.findByName(roleName);
+
+        if (role.isEmpty()) {
+            roleRepository.save(new Role(roleName));
+            System.out.println(roleName + " Created!");
         }
     }
 }

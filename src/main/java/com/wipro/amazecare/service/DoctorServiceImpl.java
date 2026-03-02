@@ -76,4 +76,10 @@ public class DoctorServiceImpl implements DoctorService {
     public void deleteDoctor(Long doctorId) {
         doctorRepository.deleteById(doctorId);
     }
+
+	@Override
+	public Object addDoctor(DoctorDto doctorDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
