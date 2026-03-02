@@ -8,6 +8,10 @@ public interface MedicalTestService {
     MedicalTestDto createMedicalTest(MedicalTestDto medicalTestDto);
 
     MedicalTestDto getMedicalTestById(Long testId);
+    
+    MedicalTestDto addMedicalTest(MedicalTestDto dto);
+
+    List<MedicalTestDto> getByConsultation(Long consultationId);
 
     List<MedicalTestDto> getTestsByConsultationId(Long consultationId);
 
