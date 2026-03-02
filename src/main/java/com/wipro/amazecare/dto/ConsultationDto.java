@@ -3,29 +3,48 @@ package com.wipro.amazecare.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class ConsultationDto {
 
     private Long consultationId;
 
     private Long appointmentId;
+
+    @NotNull(message = "Patient ID is required")
     private Long patientId;
+
+    @NotNull(message = "Doctor ID is required")
     private Long doctorId;
 
+    @NotBlank(message = "Symptoms cannot be empty")
+    @Size(max = 1000, message = "Symptoms must be less than 1000 characters")
     private String symptoms;
+
+    @Size(max = 1000, message = "Diagnosis must be less than 1000 characters")
     private String diagnosis;
+
+    @Size(max = 1000, message = "Physical examination details must be less than 1000 characters")
     private String physicalExamination;
+
+    @Size(max = 2000, message = "Treatment plan must be less than 2000 characters")
     private String treatmentPlan;
+
+    @Size(max = 2000, message = "Doctor notes must be less than 2000 characters")
     private String doctorNotes;
 
+    @NotNull(message = "Consultation date is required")
     private LocalDateTime consultationDate;
 
-    
     private List<PrescriptionDto> prescriptions;
 
     private List<MedicalTestDto> recommendedTests;
 
     public ConsultationDto() {
     }
+
 
     public Long getConsultationId() {
         return consultationId;
