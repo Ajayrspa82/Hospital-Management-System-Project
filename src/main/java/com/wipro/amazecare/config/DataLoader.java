@@ -53,11 +53,13 @@ public class DataLoader implements CommandLineRunner {
 
             User savedUser = userRepository.save(user);
 
+            
+            if(adminRepository.count() == 0) {
             Admin admin = new Admin();
             admin.setUser(savedUser);
 
             adminRepository.save(admin);
-
+            }
             System.out.println("Default Admin Created!");
         }
     }
