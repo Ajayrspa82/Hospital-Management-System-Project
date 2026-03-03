@@ -6,17 +6,37 @@ public class LoginResponseDto {
     private String role;
     private String message;
 
-    public LoginResponseDto(String email2, String name) {
-		// TODO Auto-generated constructor stub
-	}
-	public LoginResponseDto() {
-		// TODO Auto-generated constructor stub
-	}
-	public String getEmail() { return email; }
-    public String getRole() { return role; }
-    public String getMessage() { return message; }
+    public LoginResponseDto() {}
 
-    public void setEmail(String email) { this.email = email; }
-    public void setRole(String role) { this.role = role; }
-    public void setMessage(String message) { this.message = message; }
+    public LoginResponseDto(String email, String role, String message) {
+        this.email = email;
+        this.role = role;
+        this.message = message;
+    }
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+    // getters & setters
 }
