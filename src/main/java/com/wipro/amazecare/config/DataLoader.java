@@ -52,17 +52,11 @@ public class DataLoader implements CommandLineRunner {
             user.setRole(adminRole);
 
             User savedUser = userRepository.save(user);
-<<<<<<< HEAD
-            if(adminRepository.count() == 0) {
-                Admin admin = new Admin();
-                 admin.setUser(savedUser);
-=======
 
             
             if(adminRepository.count() == 0) {
             Admin admin = new Admin();
             admin.setUser(savedUser);
->>>>>>> main
 
             adminRepository.save(admin);
             }
