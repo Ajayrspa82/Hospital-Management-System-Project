@@ -1,77 +1,84 @@
 package com.wipro.amazecare.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private String password;
 
-    private boolean enabled = true;
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public User() {
+    
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(
+                new SimpleGrantedAuthority(role.getName())
+        );
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
+    @Override
+    public String getUsername() {
         return email;
     }
 
-    public String getPassword() {
-        return password;
-    }
+    @Override
+    public boolean isAccountNonExpired() { return true; }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+    @Override
+    public boolean isAccountNonLocked() { return true; }
 
-    public Role getRole() {
-        return role;
-    }
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Override
+    public boolean isEnabled() { return true; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+    
 }

@@ -1,5 +1,8 @@
 package com.wipro.amazecare.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequestDto {
 
     private String email;
@@ -7,12 +10,14 @@ public class LoginRequestDto {
 
     public LoginRequestDto() {
     }
+    @Email
+    @NotBlank
 
     public String getEmail() {
         return email;
     }
-
-    public String getPassword() {
+    @NotBlank
+	public String getPassword() {
         return password;
     }
 
