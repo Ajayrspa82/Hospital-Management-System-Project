@@ -24,6 +24,16 @@ public class PrescriptionDto {
     private int durationDays;
     
     private String duration;
+    
+    private String instructions;
+
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
 
     public String getDuration() { return duration; }
     public void setDuration(String duration) { this.duration = duration; }
