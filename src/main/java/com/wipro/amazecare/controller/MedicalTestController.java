@@ -25,7 +25,7 @@ public class MedicalTestController {
     @PostMapping
     public ResponseEntity<MedicalTestDto> addMedicalTest(
             @Valid @RequestBody MedicalTestDto dto) {
-        return ResponseEntity.ok(medicalTestService.addMedicalTest(dto));
+        return ResponseEntity.ok(medicalTestService.createMedicalTest(dto));
     }
 
     @PreAuthorize("hasAnyRole('DOCTOR','PATIENT')")
