@@ -17,6 +17,11 @@ public class Prescription {
     private String medicineName;
     private String dosage;
     private int durationDays;
+    
+    private String duration;
+
+    public String getDuration() { return duration; }
+    public void setDuration(String duration) { this.duration = duration; }
 	public Long getPrescriptionId() {
 		return prescriptionId;
 	}

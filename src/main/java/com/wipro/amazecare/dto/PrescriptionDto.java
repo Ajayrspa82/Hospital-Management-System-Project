@@ -22,6 +22,11 @@ public class PrescriptionDto {
 
     @Min(value = 1, message = "Duration must be at least 1 day")
     private int durationDays;
+    
+    private String duration;
+
+    public String getDuration() { return duration; }
+    public void setDuration(String duration) { this.duration = duration; }
 
     public Long getPrescriptionId() {
         return prescriptionId;

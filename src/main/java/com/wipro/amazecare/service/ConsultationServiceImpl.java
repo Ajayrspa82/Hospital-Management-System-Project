@@ -7,14 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.ConsultationDto;
-import com.wipro.amazecare.entity.Consultation;
-import com.wipro.amazecare.entity.Doctor;
-import com.wipro.amazecare.entity.Patient;
+import com.wipro.amazecare.dto.PrescriptionDto;
+import com.wipro.amazecare.dto.MedicalTestDto;
+import com.wipro.amazecare.entity.*;
 import com.wipro.amazecare.exception.BadRequestException;
 import com.wipro.amazecare.exception.ResourceNotFoundException;
-import com.wipro.amazecare.repository.ConsultationRepository;
-import com.wipro.amazecare.repository.DoctorRepository;
-import com.wipro.amazecare.repository.PatientRepository;
+import com.wipro.amazecare.repository.*;
 
 @Service
 public class ConsultationServiceImpl implements ConsultationService {
@@ -28,6 +26,9 @@ public class ConsultationServiceImpl implements ConsultationService {
     @Autowired
     private DoctorRepository doctorRepository;
 
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
     @Override
     public ConsultationDto createConsultation(ConsultationDto dto) {
 
@@ -36,20 +37,57 @@ public class ConsultationServiceImpl implements ConsultationService {
         }
 
         Patient patient = patientRepository.findById(dto.getPatientId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Patient not found with id: " + dto.getPatientId()));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Patient not found with id: " + dto.getPatientId()));
 
         Doctor doctor = doctorRepository.findById(dto.getDoctorId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Doctor not found with id: " + dto.getDoctorId()));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Doctor not found with id: " + dto.getDoctorId()));
 
         Consultation consultation = new Consultation();
+
         consultation.setPatient(patient);
         consultation.setDoctor(doctor);
         consultation.setSymptoms(dto.getSymptoms());
+        consultation.setDiagnosis(dto.getDiagnosis());
         consultation.setPhysicalExamination(dto.getPhysicalExamination());
         consultation.setTreatmentPlan(dto.getTreatmentPlan());
+        consultation.setDoctorNotes(dto.getDoctorNotes());
         consultation.setConsultationDate(dto.getConsultationDate());
+
+        if (dto.getAppointmentId() != null) {
+            Appointment appointment = appointmentRepository.findById(dto.getAppointmentId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Appointment not found with id: " + dto.getAppointmentId()));
+            consultation.setAppointment(appointment);
+        }
+
+        if (dto.getPrescriptions() != null && !dto.getPrescriptions().isEmpty()) {
+
+            List<Prescription> prescriptionList = dto.getPrescriptions().stream().map(pDto -> {
+                Prescription prescription = new Prescription();
+                prescription.setMedicineName(pDto.getMedicineName());
+                prescription.setDosage(pDto.getDosage());
+                prescription.setDuration(pDto.getDuration());
+                prescription.setConsultation(consultation);
+                return prescription;
+            }).collect(Collectors.toList());
+
+            consultation.setPrescriptions(prescriptionList);
+        }
+
+        if (dto.getRecommendedTests() != null && !dto.getRecommendedTests().isEmpty()) {
+
+            List<MedicalTest> testList = dto.getRecommendedTests().stream().map(tDto -> {
+                MedicalTest test = new MedicalTest();
+                test.setTestName(tDto.getTestName());
+                test.setDescription(tDto.getDescription());
+                test.setConsultation(consultation);
+                return test;
+            }).collect(Collectors.toList());
+
+            consultation.setRecommendedTests(testList);
+        }
 
         repository.save(consultation);
 
@@ -60,8 +98,8 @@ public class ConsultationServiceImpl implements ConsultationService {
     public ConsultationDto getConsultationById(Long id) {
 
         Consultation consultation = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Consultation not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Consultation not found with id: " + id));
 
         return mapToDto(consultation);
     }
@@ -79,8 +117,7 @@ public class ConsultationServiceImpl implements ConsultationService {
     public List<ConsultationDto> getByPatient(Long patientId) {
 
         if (!patientRepository.existsById(patientId)) {
-            throw new ResourceNotFoundException(
-                    "Patient not found with id: " + patientId);
+            throw new ResourceNotFoundException("Patient not found with id: " + patientId);
         }
 
         return repository.findByPatient_PatientId(patientId)
@@ -93,8 +130,7 @@ public class ConsultationServiceImpl implements ConsultationService {
     public List<ConsultationDto> getByDoctor(Long doctorId) {
 
         if (!doctorRepository.existsById(doctorId)) {
-            throw new ResourceNotFoundException(
-                    "Doctor not found with id: " + doctorId);
+            throw new ResourceNotFoundException("Doctor not found with id: " + doctorId);
         }
 
         return repository.findByDoctor_DoctorId(doctorId)
@@ -107,11 +143,15 @@ public class ConsultationServiceImpl implements ConsultationService {
     public ConsultationDto updateConsultation(Long id, ConsultationDto dto) {
 
         Consultation consultation = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Consultation not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Consultation not found with id: " + id));
 
         if (dto.getSymptoms() != null && !dto.getSymptoms().isBlank()) {
             consultation.setSymptoms(dto.getSymptoms());
+        }
+
+        if (dto.getDiagnosis() != null) {
+            consultation.setDiagnosis(dto.getDiagnosis());
         }
 
         if (dto.getPhysicalExamination() != null) {
@@ -120,6 +160,10 @@ public class ConsultationServiceImpl implements ConsultationService {
 
         if (dto.getTreatmentPlan() != null) {
             consultation.setTreatmentPlan(dto.getTreatmentPlan());
+        }
+
+        if (dto.getDoctorNotes() != null) {
+            consultation.setDoctorNotes(dto.getDoctorNotes());
         }
 
         if (dto.getConsultationDate() != null) {
@@ -135,23 +179,52 @@ public class ConsultationServiceImpl implements ConsultationService {
     public void deleteConsultation(Long id) {
 
         Consultation consultation = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Consultation not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Consultation not found with id: " + id));
 
         repository.delete(consultation);
     }
 
-
     private ConsultationDto mapToDto(Consultation c) {
 
         ConsultationDto dto = new ConsultationDto();
+
         dto.setConsultationId(c.getConsultationId());
         dto.setPatientId(c.getPatient().getPatientId());
         dto.setDoctorId(c.getDoctor().getDoctorId());
         dto.setSymptoms(c.getSymptoms());
+        dto.setDiagnosis(c.getDiagnosis());
         dto.setPhysicalExamination(c.getPhysicalExamination());
         dto.setTreatmentPlan(c.getTreatmentPlan());
+        dto.setDoctorNotes(c.getDoctorNotes());
         dto.setConsultationDate(c.getConsultationDate());
+
+        if (c.getAppointment() != null) {
+            dto.setAppointmentId(c.getAppointment().getAppointmentId());
+        }
+
+        if (c.getPrescriptions() != null) {
+            List<PrescriptionDto> prescriptionDtos = c.getPrescriptions().stream().map(p -> {
+                PrescriptionDto pDto = new PrescriptionDto();
+                pDto.setMedicineName(p.getMedicineName());
+                pDto.setDosage(p.getDosage());
+                pDto.setDuration(p.getDuration());
+                return pDto;
+            }).collect(Collectors.toList());
+
+            dto.setPrescriptions(prescriptionDtos);
+        }
+
+        if (c.getRecommendedTests() != null) {
+            List<MedicalTestDto> testDtos = c.getRecommendedTests().stream().map(t -> {
+                MedicalTestDto tDto = new MedicalTestDto();
+                tDto.setTestName(t.getTestName());
+                tDto.setDescription(t.getDescription());
+                return tDto;
+            }).collect(Collectors.toList());
+
+            dto.setRecommendedTests(testDtos);
+        }
 
         return dto;
     }

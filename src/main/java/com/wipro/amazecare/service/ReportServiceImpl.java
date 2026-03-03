@@ -3,6 +3,7 @@ package com.wipro.amazecare.service;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.ReportDto;
@@ -14,20 +15,17 @@ import com.wipro.amazecare.repository.PrescriptionRepository;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    private final ConsultationRepository consultationRepository;
-    private final PrescriptionRepository prescriptionRepository;
-    private final MedicalRecordRepository medicalRecordRepository;
-    private final MedicalTestRepository medicalTestRepository;
+    @Autowired
+    private ConsultationRepository consultationRepository;
 
-    public ReportServiceImpl(ConsultationRepository consultationRepository,
-                             PrescriptionRepository prescriptionRepository,
-                             MedicalRecordRepository medicalRecordRepository,
-                             MedicalTestRepository medicalTestRepository) {
-        this.consultationRepository = consultationRepository;
-        this.prescriptionRepository = prescriptionRepository;
-        this.medicalRecordRepository = medicalRecordRepository;
-        this.medicalTestRepository = medicalTestRepository;
-    }
+    @Autowired
+    private PrescriptionRepository prescriptionRepository;
+
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
+
+    @Autowired
+    private MedicalTestRepository medicalTestRepository;
 
     @Override
     public ReportDto generateSystemReport() {
@@ -52,15 +50,19 @@ public class ReportServiceImpl implements ReportService {
 
         report.setTotalConsultations(monthlyCount);
         report.setMonth(currentMonth.getMonth());
+
         return report;
     }
 
     @Override
     public ReportDto getDoctorSummary(Long doctorId) {
         ReportDto report = new ReportDto();
-        Long doctorConsultations = consultationRepository
-                .countByDoctor_DoctorId(doctorId);
+
+        Long doctorConsultations =
+                consultationRepository.countByDoctor_DoctorId(doctorId);
+
         report.setDoctorConsultations(doctorConsultations);
+
         return report;
     }
 
