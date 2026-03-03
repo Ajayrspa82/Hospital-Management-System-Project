@@ -1,6 +1,5 @@
 package com.wipro.amazecare.entity;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +13,8 @@ public class Consultation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long consultationId;
 
+    // ================= RELATIONSHIPS =================
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
@@ -21,143 +22,146 @@ public class Consultation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
-    
-    @Column(length = 1000)
-    private String diagnosis;
-    
-    @Column(length = 1000)
-    private String doctorNotes;
 
     @ManyToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
+    @OneToMany(mappedBy = "consultation",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Prescription> prescriptions;
+
+    @OneToMany(mappedBy = "consultation",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<MedicalTest> recommendedTests;
+
+    @OneToOne(mappedBy = "consultation",
+            cascade = CascadeType.ALL)
+    private MedicalRecord medicalRecord;
+
+    // ================= CONSULTATION DETAILS =================
+
     @Column(nullable = false)
     private String symptoms;
+
+    @Column(length = 1000)
+    private String diagnosis;
 
     private String physicalExamination;
 
     @Column(length = 1000)
     private String treatmentPlan;
 
+    @Column(length = 1000)
+    private String doctorNotes;
+
     private LocalDateTime consultationDate;
-    
-    @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MedicalTest> recommendedTests;
 
-    public List<MedicalTest> getRecommendedTests() { return recommendedTests; }
-    public void setRecommendedTests(List<MedicalTest> recommendedTests) { this.recommendedTests = recommendedTests; }
+    // ================= GETTERS & SETTERS =================
 
-    @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Prescription> prescriptions;
+    public Long getConsultationId() {
+        return consultationId;
+    }
 
-    @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MedicalTest> medicalTests;
+    public void setConsultationId(Long consultationId) {
+        this.consultationId = consultationId;
+    }
 
-    @OneToOne(mappedBy = "consultation", cascade = CascadeType.ALL)
-    private MedicalRecord medicalRecord;
+    public Patient getPatient() {
+        return patient;
+    }
 
-	public Long getConsultationId() {
-		return consultationId;
-	}
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
 
-	public void setConsultationId(Long consultationId) {
-		this.consultationId = consultationId;
-	}
+    public Doctor getDoctor() {
+        return doctor;
+    }
 
-	public Patient getPatient() {
-		return patient;
-	}
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
 
-	public void setPatient(Patient patient) {
-		this.patient = patient;
-	}
+    public Appointment getAppointment() {
+        return appointment;
+    }
 
-	public Doctor getDoctor() {
-		return doctor;
-	}
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
 
-	public void setDoctor(Doctor doctor) {
-		this.doctor = doctor;
-	}
+    public List<Prescription> getPrescriptions() {
+        return prescriptions;
+    }
 
-	public String getSymptoms() {
-		return symptoms;
-	}
+    public void setPrescriptions(List<Prescription> prescriptions) {
+        this.prescriptions = prescriptions;
+    }
 
-	public void setSymptoms(String symptoms) {
-		this.symptoms = symptoms;
-	}
+    public List<MedicalTest> getRecommendedTests() {
+        return recommendedTests;
+    }
 
-	public String getDiagnosis() {
-		return diagnosis;
-	}
+    public void setRecommendedTests(List<MedicalTest> recommendedTests) {
+        this.recommendedTests = recommendedTests;
+    }
 
-	public void setDiagnosis(String diagnosis) {
-		this.diagnosis = diagnosis;
-	}
+    public MedicalRecord getMedicalRecord() {
+        return medicalRecord;
+    }
 
-	public String getDoctorNotes() {
-		return doctorNotes;
-	}
+    public void setMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
+    }
 
-	public void setDoctorNotes(String doctorNotes) {
-		this.doctorNotes = doctorNotes;
-	}
+    public String getSymptoms() {
+        return symptoms;
+    }
 
-	public Appointment getAppointment() {
-		return appointment;
-	}
+    public void setSymptoms(String symptoms) {
+        this.symptoms = symptoms;
+    }
 
-	public void setAppointment(Appointment appointment) {
-		this.appointment = appointment;
-	}
+    public String getDiagnosis() {
+        return diagnosis;
+    }
 
-	public String getPhysicalExamination() {
-		return physicalExamination;
-	}
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
 
-	public void setPhysicalExamination(String physicalExamination) {
-		this.physicalExamination = physicalExamination;
-	}
+    public String getPhysicalExamination() {
+        return physicalExamination;
+    }
 
-	public String getTreatmentPlan() {
-		return treatmentPlan;
-	}
+    public void setPhysicalExamination(String physicalExamination) {
+        this.physicalExamination = physicalExamination;
+    }
 
-	public void setTreatmentPlan(String treatmentPlan) {
-		this.treatmentPlan = treatmentPlan;
-	}
+    public String getTreatmentPlan() {
+        return treatmentPlan;
+    }
 
-	public LocalDateTime getConsultationDate() {
-		return consultationDate;
-	}
+    public void setTreatmentPlan(String treatmentPlan) {
+        this.treatmentPlan = treatmentPlan;
+    }
 
-	public void setConsultationDate(LocalDateTime consultationDate) {
-		this.consultationDate = consultationDate;
-	}
+    public String getDoctorNotes() {
+        return doctorNotes;
+    }
 
-	public List<Prescription> getPrescriptions() {
-		return prescriptions;
-	}
+    public void setDoctorNotes(String doctorNotes) {
+        this.doctorNotes = doctorNotes;
+    }
 
-	public void setPrescriptions(List<Prescription> prescriptions) {
-		this.prescriptions = prescriptions;
-	}
+    public LocalDateTime getConsultationDate() {
+        return consultationDate;
+    }
 
-	public List<MedicalTest> getMedicalTests() {
-		return medicalTests;
-	}
-
-	public void setMedicalTests(List<MedicalTest> medicalTests) {
-		this.medicalTests = medicalTests;
-	}
-
-	public MedicalRecord getMedicalRecord() {
-		return medicalRecord;
-	}
-
-	public void setMedicalRecord(MedicalRecord medicalRecord) {
-		this.medicalRecord = medicalRecord;
-	}
+    public void setConsultationDate(LocalDateTime consultationDate) {
+        this.consultationDate = consultationDate;
+    }
 }
