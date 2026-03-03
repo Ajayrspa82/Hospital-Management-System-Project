@@ -2,6 +2,7 @@ package com.wipro.amazecare.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.wipro.amazecare.dto.LoginRequestDto;
 import com.wipro.amazecare.dto.LoginResponseDto;
 import com.wipro.amazecare.dto.RegisterRequestDto;
@@ -14,24 +15,20 @@ import com.wipro.amazecare.repository.UserRepository;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private JwtService jwtService;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
-                           JwtService jwtService,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDto register(RegisterRequestDto request) {
-
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
@@ -43,20 +40,17 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(role);
-
         userRepository.save(user);
 
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
         dto.setRole(role.getName());
-
         return dto;
     }
 
     @Override
     public LoginResponseDto login(LoginRequestDto request) {
-
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
@@ -64,12 +58,6 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid credentials");
         }
 
-        String token = jwtService.generateToken(user);
-
-        return new LoginResponseDto(
-                token,
-                user.getEmail(),
-                user.getRole().getName()
-        );
+        return new LoginResponseDto(user.getEmail(), user.getRole().getName());
     }
 }

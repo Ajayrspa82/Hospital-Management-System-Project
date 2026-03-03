@@ -3,6 +3,7 @@ package com.wipro.amazecare.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.SpecializationDto;
@@ -12,28 +13,35 @@ import com.wipro.amazecare.repository.SpecializationRepository;
 @Service
 public class SpecializationServiceImpl implements SpecializationService {
 
-    private final SpecializationRepository repository;
-
-    public SpecializationServiceImpl(SpecializationRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private SpecializationRepository specializationRepository;
 
     @Override
     public SpecializationDto createSpecialization(SpecializationDto dto) {
+
         Specialization specialization = new Specialization();
         specialization.setSpecializationName(dto.getSpecializationName());
-        repository.save(specialization);
-        dto.setSpecializationId(specialization.getSpecializationId());
-        return dto;
+
+        Specialization saved = specializationRepository.save(specialization);
+
+        return mapToDto(saved);
     }
 
     @Override
     public List<SpecializationDto> getAllSpecializations() {
-        return repository.findAll().stream().map(s -> {
-            SpecializationDto dto = new SpecializationDto();
-            dto.setSpecializationId(s.getSpecializationId());
-            dto.setSpecializationName(s.getSpecializationName());
-            return dto;
-        }).collect(Collectors.toList());
+
+        return specializationRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    private SpecializationDto mapToDto(Specialization specialization) {
+
+        SpecializationDto dto = new SpecializationDto();
+        dto.setSpecializationId(specialization.getSpecializationId());
+        dto.setSpecializationName(specialization.getSpecializationName());
+
+        return dto;
     }
 }
