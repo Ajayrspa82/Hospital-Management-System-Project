@@ -1,14 +1,19 @@
 package com.wipro.amazecare.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.naming.AuthenticationException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.amazecare.dto.LoginRequestDto;
 import com.wipro.amazecare.dto.LoginResponseDto;
+import com.wipro.amazecare.entity.User;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -17,28 +22,33 @@ import jakarta.servlet.http.HttpSession;
 @CrossOrigin("*")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+
+    public AuthController(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginDto, HttpSession session) {
-        try {
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+    public ResponseEntity<LoginResponseDto> login(
+            @RequestBody LoginRequestDto loginDto,
+            HttpSession session) throws AuthenticationException {
 
-            authenticationManager.authenticate(authToken);
+        org.springframework.security.core.Authentication authentication =
+		        authenticationManager.authenticate(
+		                new UsernamePasswordAuthenticationToken(
+		                        loginDto.getEmail(),
+		                        loginDto.getPassword()
+		                ));
 
-            session.setAttribute("USER", loginDto.getEmail());
+		User user = (User) authentication.getPrincipal();
 
-            LoginResponseDto response = new LoginResponseDto();
-            response.setEmail(loginDto.getEmail());
-            response.setMessage("Login successful");
+		session.setAttribute("USER", user.getEmail());
 
-            return ResponseEntity.ok(response);
-        } catch (AuthenticationException ex) {
-            LoginResponseDto response = new LoginResponseDto();
-            response.setMessage("Invalid credentials");
-            return ResponseEntity.status(401).body(response);
-        }
+		LoginResponseDto response = new LoginResponseDto();
+		response.setEmail(user.getEmail());
+		response.setRole(user.getRole().getName());
+		response.setMessage("Login successful");
+
+		return ResponseEntity.ok(response);
     }
 }
