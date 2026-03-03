@@ -3,6 +3,7 @@ package com.wipro.amazecare.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.PatientDto;
@@ -12,40 +13,27 @@ import com.wipro.amazecare.repository.PatientRepository;
 @Service
 public class PatientServiceImpl implements PatientService {
 
-    private final PatientRepository patientRepository;
+    @Autowired
+    private PatientRepository patientRepository;
 
-    public PatientServiceImpl(PatientRepository patientRepository) {
-        this.patientRepository = patientRepository;
-    }
-
-    // Create Patient
     @Override
     public PatientDto createPatient(PatientDto dto) {
 
-        Patient patient = new Patient();
-        patient.setFullName(dto.getFullName());
-        patient.setDateOfBirth(dto.getDateOfBirth());
-        patient.setGender(dto.getGender());
-        patient.setMobileNumber(dto.getMobileNumber());
-        patient.setEmail(dto.getEmail());
-        patient.setMedicalHistory(dto.getMedicalHistory());
-
+        Patient patient = mapToEntity(dto);
         Patient savedPatient = patientRepository.save(patient);
 
         return mapToDto(savedPatient);
     }
 
-    // Get Patient By ID
     @Override
-    public PatientDto getPatientById(Long patientId) {
+    public PatientDto getPatientById(Long id) {
 
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient not found with id " + patientId));
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found with id " + id));
 
         return mapToDto(patient);
     }
 
-    // Get All Patients
     @Override
     public List<PatientDto> getAllPatients() {
 
@@ -55,39 +43,37 @@ public class PatientServiceImpl implements PatientService {
                 .collect(Collectors.toList());
     }
 
-    // Update Patient
     @Override
-    public PatientDto updatePatient(Long patientId, PatientDto dto) {
+    public PatientDto updatePatient(Long id, PatientDto dto) {
 
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient not found with id " + patientId));
+        Patient existing = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found with id " + id));
 
-        patient.setFullName(dto.getFullName());
-        patient.setDateOfBirth(dto.getDateOfBirth());
-        patient.setGender(dto.getGender());
-        patient.setMobileNumber(dto.getMobileNumber());
-        patient.setEmail(dto.getEmail());
-        patient.setMedicalHistory(dto.getMedicalHistory());
+        existing.setFullName(dto.getFullName());
+        existing.setDateOfBirth(dto.getDateOfBirth());
+        existing.setGender(dto.getGender());
+        existing.setMobileNumber(dto.getMobileNumber());
+        existing.setEmail(dto.getEmail());
+        existing.setMedicalHistory(dto.getMedicalHistory());
 
-        Patient updatedPatient = patientRepository.save(patient);
+        Patient updated = patientRepository.save(existing);
 
-        return mapToDto(updatedPatient);
+        return mapToDto(updated);
     }
 
-    // Delete Patient
     @Override
-    public void deletePatient(Long patientId) {
+    public void deletePatient(Long id) {
 
-        if (!patientRepository.existsById(patientId)) {
-            throw new RuntimeException("Patient not found with id " + patientId);
+        if (!patientRepository.existsById(id)) {
+            throw new RuntimeException("Patient not found with id " + id);
         }
 
-        patientRepository.deleteById(patientId);
+        patientRepository.deleteById(id);
     }
 
-    // 🔥 Mapping Method (Important)
-    private PatientDto mapToDto(Patient patient) {
+    // ===== Mapping Methods =====
 
+    private PatientDto mapToDto(Patient patient) {
         PatientDto dto = new PatientDto();
         dto.setPatientId(patient.getPatientId());
         dto.setFullName(patient.getFullName());
@@ -96,7 +82,17 @@ public class PatientServiceImpl implements PatientService {
         dto.setMobileNumber(patient.getMobileNumber());
         dto.setEmail(patient.getEmail());
         dto.setMedicalHistory(patient.getMedicalHistory());
-
         return dto;
+    }
+
+    private Patient mapToEntity(PatientDto dto) {
+        Patient patient = new Patient();
+        patient.setFullName(dto.getFullName());
+        patient.setDateOfBirth(dto.getDateOfBirth());
+        patient.setGender(dto.getGender());
+        patient.setMobileNumber(dto.getMobileNumber());
+        patient.setEmail(dto.getEmail());
+        patient.setMedicalHistory(dto.getMedicalHistory());
+        return patient;
     }
 }

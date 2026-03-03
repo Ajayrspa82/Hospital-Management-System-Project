@@ -17,10 +17,16 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long patientId;
 
+    @Column(nullable = false)
     private String fullName;
+
     private LocalDate dateOfBirth;
     private String gender;
+
+    @Column(unique = true)
     private String mobileNumber;
+
+    @Column(unique = true)
     private String email;
 
     @Column(length = 500)
