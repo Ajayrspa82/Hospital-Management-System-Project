@@ -25,6 +25,7 @@ public class DataLoader implements CommandLineRunner {
                       UserRepository userRepository,
                       AdminRepository adminRepository,
                       PasswordEncoder passwordEncoder) {
+
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.adminRepository = adminRepository;
@@ -32,14 +33,19 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
 
         createRoleIfNotFound("ROLE_ADMIN");
         createRoleIfNotFound("ROLE_DOCTOR");
         createRoleIfNotFound("ROLE_PATIENT");
 
+        
         if (userRepository.findByEmail("admin@amazecare.com").isEmpty()) {
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseThrow();
+
+            Role adminRole = roleRepository
+                    .findByName("ROLE_ADMIN")
+                    .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
+
             User user = new User();
             user.setEmail("admin@amazecare.com");
             user.setPassword(passwordEncoder.encode("admin123"));
@@ -47,17 +53,20 @@ public class DataLoader implements CommandLineRunner {
 
             User savedUser = userRepository.save(user);
 
-            if (adminRepository.count() == 0) {
-                Admin admin = new Admin();
-                admin.setUser(savedUser);
-                adminRepository.save(admin);
+            
+            if(adminRepository.count() == 0) {
+            Admin admin = new Admin();
+            admin.setUser(savedUser);
+
+            adminRepository.save(admin);
             }
             System.out.println("Default Admin Created!");
         }
     }
-
     private void createRoleIfNotFound(String roleName) {
+
         Optional<Role> role = roleRepository.findByName(roleName);
+
         if (role.isEmpty()) {
             roleRepository.save(new Role(roleName));
             System.out.println(roleName + " Created!");
