@@ -1,3 +1,0 @@
-jwt:
-  secret: YourSecretKeyHere
-  expiration: 3600000
