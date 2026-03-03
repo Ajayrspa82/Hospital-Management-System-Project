@@ -16,14 +16,6 @@ public class Role {
     @Column(unique = true)
     private String name;
 
- 
-    
-	public Role() {
-		// TODO Auto-generated constructor stub
-	}
-	public Long getId() { return id; }
-    public String getName() { return name; }
-
     public Role() {}
 
     public Role(String name) {
@@ -45,6 +37,5 @@ public class Role {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 
 }
