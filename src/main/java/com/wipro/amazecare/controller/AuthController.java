@@ -1,10 +1,6 @@
 package com.wipro.amazecare.controller;
 
-import javax.naming.AuthenticationException;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,42 +9,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.amazecare.dto.LoginRequestDto;
 import com.wipro.amazecare.dto.LoginResponseDto;
-import com.wipro.amazecare.entity.User;
+import com.wipro.amazecare.dto.RegisterRequestDto;
+import com.wipro.amazecare.service.AuthService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin("*")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthService authService;
 
-    public AuthController(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+    // Constructor Autowiring
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
+    // ✅ LOGIN
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
-            @RequestBody LoginRequestDto loginDto,
-            HttpSession session) throws AuthenticationException {
+            @Valid @RequestBody LoginRequestDto loginDto,
+            HttpSession session) {
 
-        org.springframework.security.core.Authentication authentication =
-		        authenticationManager.authenticate(
-		                new UsernamePasswordAuthenticationToken(
-		                        loginDto.getEmail(),
-		                        loginDto.getPassword()
-		                ));
+        LoginResponseDto response = authService.login(loginDto);
 
-		User user = (User) authentication.getPrincipal();
+        session.setAttribute("USER", response.getEmail());
 
-		session.setAttribute("USER", user.getEmail());
+        return ResponseEntity.ok(response);
+    }
 
-		LoginResponseDto response = new LoginResponseDto();
-		response.setEmail(user.getEmail());
-		response.setRole(user.getRole().getName());
-		response.setMessage("Login successful");
+    // ✅ REGISTER
+    @PostMapping("/register")
+    public ResponseEntity<String> register(
+            @Valid @RequestBody RegisterRequestDto registerDto) {
 
-		return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authService.register(registerDto));
     }
 }
