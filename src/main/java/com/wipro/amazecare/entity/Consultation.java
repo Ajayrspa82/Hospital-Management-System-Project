@@ -21,6 +21,16 @@ public class Consultation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
+    
+    @Column(length = 1000)
+    private String diagnosis;
+    
+    @Column(length = 1000)
+    private String doctorNotes;
+
+    @ManyToOne
+    @JoinColumn(name = "appointment_id")
+    private Appointment appointment;
 
     @Column(nullable = false)
     private String symptoms;
@@ -31,6 +41,12 @@ public class Consultation {
     private String treatmentPlan;
 
     private LocalDateTime consultationDate;
+    
+    @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MedicalTest> recommendedTests;
+
+    public List<MedicalTest> getRecommendedTests() { return recommendedTests; }
+    public void setRecommendedTests(List<MedicalTest> recommendedTests) { this.recommendedTests = recommendedTests; }
 
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prescription> prescriptions;
@@ -71,6 +87,30 @@ public class Consultation {
 
 	public void setSymptoms(String symptoms) {
 		this.symptoms = symptoms;
+	}
+
+	public String getDiagnosis() {
+		return diagnosis;
+	}
+
+	public void setDiagnosis(String diagnosis) {
+		this.diagnosis = diagnosis;
+	}
+
+	public String getDoctorNotes() {
+		return doctorNotes;
+	}
+
+	public void setDoctorNotes(String doctorNotes) {
+		this.doctorNotes = doctorNotes;
+	}
+
+	public Appointment getAppointment() {
+		return appointment;
+	}
+
+	public void setAppointment(Appointment appointment) {
+		this.appointment = appointment;
 	}
 
 	public String getPhysicalExamination() {
