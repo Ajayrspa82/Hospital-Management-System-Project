@@ -27,14 +27,14 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Consultation consultation = consultationRepository.findById(dto.getConsultationId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Consultation not found with id: " + dto.getConsultationId()));
+                        new ResourceNotFoundException(
+                                "Consultation not found with id: " + dto.getConsultationId()));
 
         Prescription prescription = new Prescription();
         prescription.setConsultation(consultation);
         prescription.setMedicineName(dto.getMedicineName());
         prescription.setDosage(dto.getDosage());
-        prescription.setDuration(dto.getDuration());
-        prescription.setDurationDays(dto.getDurationDays());
+        prescription.setDuration(dto.getDuration());   // ✅ only duration string
 
         prescriptionRepository.save(prescription);
 
@@ -61,7 +61,8 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Prescription prescription = prescriptionRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Prescription not found with id: " + id));
+                        new ResourceNotFoundException(
+                                "Prescription not found with id: " + id));
 
         return mapToDto(prescription);
     }
@@ -71,7 +72,8 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Prescription prescription = prescriptionRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Prescription not found with id: " + id));
+                        new ResourceNotFoundException(
+                                "Prescription not found with id: " + id));
 
         if (dto.getMedicineName() != null && !dto.getMedicineName().isBlank())
             prescription.setMedicineName(dto.getMedicineName());
@@ -79,11 +81,8 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         if (dto.getDosage() != null && !dto.getDosage().isBlank())
             prescription.setDosage(dto.getDosage());
 
-        if (dto.getDuration() != null)
+        if (dto.getDuration() != null && !dto.getDuration().isBlank())
             prescription.setDuration(dto.getDuration());
-
-        if (dto.getDurationDays() > 0)
-            prescription.setDurationDays(dto.getDurationDays());
 
         prescriptionRepository.save(prescription);
 
@@ -95,7 +94,8 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Prescription prescription = prescriptionRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Prescription not found with id: " + id));
+                        new ResourceNotFoundException(
+                                "Prescription not found with id: " + id));
 
         prescriptionRepository.delete(prescription);
     }
@@ -107,8 +107,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         dto.setConsultationId(p.getConsultation().getConsultationId());
         dto.setMedicineName(p.getMedicineName());
         dto.setDosage(p.getDosage());
-        dto.setDuration(p.getDuration());
-        dto.setDurationDays(p.getDurationDays());
+        dto.setDuration(p.getDuration());  // ✅ only duration
 
         return dto;
     }

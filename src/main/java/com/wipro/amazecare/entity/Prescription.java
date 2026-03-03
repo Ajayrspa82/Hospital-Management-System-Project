@@ -19,6 +19,16 @@ public class Prescription {
     private int durationDays;
     
     private String duration;
+    @Column(length = 500)
+    private String instructions;
+
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
 
     public String getDuration() { return duration; }
     public void setDuration(String duration) { this.duration = duration; }

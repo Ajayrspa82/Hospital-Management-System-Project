@@ -62,6 +62,7 @@ public class ConsultationServiceImpl implements ConsultationService {
             consultation.setAppointment(appointment);
         }
 
+        // ------------------- PRESCRIPTIONS -------------------
         if (dto.getPrescriptions() != null && !dto.getPrescriptions().isEmpty()) {
 
             List<Prescription> prescriptionList = dto.getPrescriptions().stream().map(pDto -> {
@@ -69,6 +70,7 @@ public class ConsultationServiceImpl implements ConsultationService {
                 prescription.setMedicineName(pDto.getMedicineName());
                 prescription.setDosage(pDto.getDosage());
                 prescription.setDuration(pDto.getDuration());
+                prescription.setInstructions(pDto.getInstructions());
                 prescription.setConsultation(consultation);
                 return prescription;
             }).collect(Collectors.toList());
@@ -76,14 +78,26 @@ public class ConsultationServiceImpl implements ConsultationService {
             consultation.setPrescriptions(prescriptionList);
         }
 
+        // ------------------- MEDICAL TESTS -------------------
         if (dto.getRecommendedTests() != null && !dto.getRecommendedTests().isEmpty()) {
 
             List<MedicalTest> testList = dto.getRecommendedTests().stream().map(tDto -> {
+
                 MedicalTest test = new MedicalTest();
                 test.setTestName(tDto.getTestName());
                 test.setDescription(tDto.getDescription());
+                test.setResult(tDto.getResult());
+
+                // 🔥 IMPORTANT FIX
+                if (tDto.getTestStatus() == null || tDto.getTestStatus().isBlank()) {
+                    throw new BadRequestException("Test status cannot be null or blank");
+                }
+                test.setTestStatus(tDto.getTestStatus());
+
                 test.setConsultation(consultation);
+
                 return test;
+
             }).collect(Collectors.toList());
 
             consultation.setRecommendedTests(testList);
@@ -146,29 +160,23 @@ public class ConsultationServiceImpl implements ConsultationService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Consultation not found with id: " + id));
 
-        if (dto.getSymptoms() != null && !dto.getSymptoms().isBlank()) {
+        if (dto.getSymptoms() != null && !dto.getSymptoms().isBlank())
             consultation.setSymptoms(dto.getSymptoms());
-        }
 
-        if (dto.getDiagnosis() != null) {
+        if (dto.getDiagnosis() != null)
             consultation.setDiagnosis(dto.getDiagnosis());
-        }
 
-        if (dto.getPhysicalExamination() != null) {
+        if (dto.getPhysicalExamination() != null)
             consultation.setPhysicalExamination(dto.getPhysicalExamination());
-        }
 
-        if (dto.getTreatmentPlan() != null) {
+        if (dto.getTreatmentPlan() != null)
             consultation.setTreatmentPlan(dto.getTreatmentPlan());
-        }
 
-        if (dto.getDoctorNotes() != null) {
+        if (dto.getDoctorNotes() != null)
             consultation.setDoctorNotes(dto.getDoctorNotes());
-        }
 
-        if (dto.getConsultationDate() != null) {
+        if (dto.getConsultationDate() != null)
             consultation.setConsultationDate(dto.getConsultationDate());
-        }
 
         repository.save(consultation);
 
@@ -199,9 +207,8 @@ public class ConsultationServiceImpl implements ConsultationService {
         dto.setDoctorNotes(c.getDoctorNotes());
         dto.setConsultationDate(c.getConsultationDate());
 
-        if (c.getAppointment() != null) {
+        if (c.getAppointment() != null)
             dto.setAppointmentId(c.getAppointment().getAppointmentId());
-        }
 
         if (c.getPrescriptions() != null) {
             List<PrescriptionDto> prescriptionDtos = c.getPrescriptions().stream().map(p -> {
@@ -209,6 +216,7 @@ public class ConsultationServiceImpl implements ConsultationService {
                 pDto.setMedicineName(p.getMedicineName());
                 pDto.setDosage(p.getDosage());
                 pDto.setDuration(p.getDuration());
+                pDto.setInstructions(p.getInstructions());
                 return pDto;
             }).collect(Collectors.toList());
 
@@ -219,7 +227,9 @@ public class ConsultationServiceImpl implements ConsultationService {
             List<MedicalTestDto> testDtos = c.getRecommendedTests().stream().map(t -> {
                 MedicalTestDto tDto = new MedicalTestDto();
                 tDto.setTestName(t.getTestName());
+                tDto.setTestStatus(t.getTestStatus());
                 tDto.setDescription(t.getDescription());
+                tDto.setResult(t.getResult());
                 return tDto;
             }).collect(Collectors.toList());
 
