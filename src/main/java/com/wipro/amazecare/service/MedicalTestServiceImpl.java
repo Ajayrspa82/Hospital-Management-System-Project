@@ -12,6 +12,7 @@ import com.wipro.amazecare.entity.MedicalTest;
 import com.wipro.amazecare.exception.ResourceNotFoundException;
 import com.wipro.amazecare.repository.ConsultationRepository;
 import com.wipro.amazecare.repository.MedicalTestRepository;
+
 @Service
 public class MedicalTestServiceImpl implements MedicalTestService {
 
@@ -22,43 +23,18 @@ public class MedicalTestServiceImpl implements MedicalTestService {
     private ConsultationRepository consultationRepository;
 
     @Override
-    public MedicalTestDto addMedicalTest(MedicalTestDto dto) {
+    public MedicalTestDto createMedicalTest(MedicalTestDto dto) {
 
         Consultation consultation = consultationRepository.findById(dto.getConsultationId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Consultation not found with id: " + dto.getConsultationId()));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Consultation not found with id: " + dto.getConsultationId()));
 
         MedicalTest test = new MedicalTest();
         test.setConsultation(consultation);
         test.setTestName(dto.getTestName());
         test.setTestStatus(dto.getTestStatus());
-
-        medicalTestRepository.save(test);
-
-        dto.setTestId(test.getTestId());
-        return dto;
-    }
-
-    @Override
-    public List<MedicalTestDto> getByConsultation(Long consultationId) {
-
-        List<MedicalTest> tests = medicalTestRepository
-                .findByConsultation_ConsultationId(consultationId);
-
-        return tests.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public MedicalTestDto updateMedicalTest(Long id, MedicalTestDto dto) {
-
-        MedicalTest test = medicalTestRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Medical test not found with id: " + id));
-
-        if (dto.getTestName() != null) test.setTestName(dto.getTestName());
-        if (dto.getTestStatus() != null) test.setTestStatus(dto.getTestStatus());
+        test.setDescription(dto.getDescription());
+        test.setResult(dto.getResult());
 
         medicalTestRepository.save(test);
 
@@ -66,38 +42,74 @@ public class MedicalTestServiceImpl implements MedicalTestService {
     }
 
     @Override
-    public void deleteMedicalTest(Long id) {
-        MedicalTest test = medicalTestRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Medical test not found with id: " + id));
+    public MedicalTestDto getMedicalTestById(Long testId) {
+
+        MedicalTest test = medicalTestRepository.findById(testId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Medical test not found with id: " + testId));
+
+        return mapToDto(test);
+    }
+
+    @Override
+    public List<MedicalTestDto> getByConsultation(Long consultationId) {
+
+        if (!consultationRepository.existsById(consultationId)) {
+            throw new ResourceNotFoundException(
+                    "Consultation not found with id: " + consultationId);
+        }
+
+        return medicalTestRepository
+                .findByConsultation_ConsultationId(consultationId)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public MedicalTestDto updateMedicalTest(Long testId, MedicalTestDto dto) {
+
+        MedicalTest test = medicalTestRepository.findById(testId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Medical test not found with id: " + testId));
+
+        if (dto.getTestName() != null && !dto.getTestName().isBlank())
+            test.setTestName(dto.getTestName());
+
+        if (dto.getTestStatus() != null && !dto.getTestStatus().isBlank())
+            test.setTestStatus(dto.getTestStatus());
+
+        if (dto.getDescription() != null)
+            test.setDescription(dto.getDescription());
+
+        if (dto.getResult() != null)
+            test.setResult(dto.getResult());
+
+        medicalTestRepository.save(test);
+
+        return mapToDto(test);
+    }
+
+    @Override
+    public void deleteMedicalTest(Long testId) {
+
+        MedicalTest test = medicalTestRepository.findById(testId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Medical test not found with id: " + testId));
 
         medicalTestRepository.delete(test);
     }
 
     private MedicalTestDto mapToDto(MedicalTest test) {
+
         MedicalTestDto dto = new MedicalTestDto();
         dto.setTestId(test.getTestId());
         dto.setConsultationId(test.getConsultation().getConsultationId());
         dto.setTestName(test.getTestName());
         dto.setTestStatus(test.getTestStatus());
+        dto.setDescription(test.getDescription());
+        dto.setResult(test.getResult());
+
         return dto;
     }
-
-	@Override
-	public MedicalTestDto createMedicalTest(MedicalTestDto medicalTestDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public MedicalTestDto getMedicalTestById(Long testId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<MedicalTestDto> getTestsByConsultationId(Long consultationId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
