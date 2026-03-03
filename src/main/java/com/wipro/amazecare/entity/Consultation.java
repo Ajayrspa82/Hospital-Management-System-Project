@@ -160,6 +160,4 @@ public class Consultation {
 	public void setMedicalRecord(MedicalRecord medicalRecord) {
 		this.medicalRecord = medicalRecord;
 	}
-
-    // Getters + Setters (keep yours same)
 }
