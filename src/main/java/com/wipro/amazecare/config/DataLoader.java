@@ -1,13 +1,15 @@
 package com.wipro.amazecare.config;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-import com.wipro.amazecare.entity.*;
-import com.wipro.amazecare.repository.*;
+import com.wipro.amazecare.entity.Role;
+import com.wipro.amazecare.entity.User;
+import com.wipro.amazecare.repository.RoleRepository;
+import com.wipro.amazecare.repository.UserRepository;
 
-@Configuration
+@Component
 public class DataLoader implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
@@ -17,7 +19,6 @@ public class DataLoader implements CommandLineRunner {
     public DataLoader(RoleRepository roleRepository,
                       UserRepository userRepository,
                       PasswordEncoder passwordEncoder) {
-
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -26,71 +27,38 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        // ✅ Create Roles if not exist
+        createRoleIfNotExists("ROLE_ADMIN");
+        createRoleIfNotExists("ROLE_DOCTOR");
+        createRoleIfNotExists("ROLE_PATIENT");
 
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseGet(() -> {
-                    Role role = new Role();
-                    role.setName("ROLE_ADMIN");
-                    return roleRepository.save(role);
-                });
-
-        roleRepository.findByName("ROLE_DOCTOR")
-                .orElseGet(() -> {
-                    Role role = new Role();
-                    role.setName("ROLE_DOCTOR");
-                    return roleRepository.save(role);
-                });
-
-        roleRepository.findByName("ROLE_PATIENT")
-                .orElseGet(() -> {
-                    Role role = new Role();
-                    role.setName("ROLE_PATIENT");
-                    return roleRepository.save(role);
-                });
-
-        userRepository.findByEmail("admin@amazecare.com")
-                .orElseGet(() -> {
-                    User user = new User();
-                    user.setEmail("admin@amazecare.com");
-                    user.setPassword(passwordEncoder.encode("admin123"));
-                    user.setRole(adminRole);
-                    return userRepository
-        createRoleIfNotFound("ROLE_ADMIN");
-        createRoleIfNotFound("ROLE_DOCTOR");
-        createRoleIfNotFound("ROLE_PATIENT");
-
-        
+        // ✅ Create Default Admin User
         if (userRepository.findByEmail("admin@amazecare.com").isEmpty()) {
 
-            Role adminRole = roleRepository
-                    .findByName("ROLE_ADMIN")
+            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                     .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
 
-            User user = new User();
-            user.setEmail("admin@amazecare.com");
-            user.setPassword(passwordEncoder.encode("admin123"));
-            user.setRole(adminRole);
+            User adminUser = new User();
+            adminUser.setEmail("admin@amazecare.com");
+            adminUser.setPassword(passwordEncoder.encode("admin123"));
+            adminUser.setRole(adminRole);
 
-            User savedUser = userRepository.save(user);
+            userRepository.save(adminUser);
 
-            
-            if(adminRepository.count() == 0) {
-            Admin admin = new Admin();
-            admin.setUser(savedUser);
-
-            adminRepository.save(admin);
-            }
-            System.out.println("Default Admin Created!");
+            System.out.println("✅ Default Admin Created!");
+            System.out.println("Email: admin@amazecare.com");
+            System.out.println("Password: admin123");
+        } else {
+            System.out.println("ℹ️ Admin already exists.");
         }
     }
-    private void createRoleIfNotFound(String roleName) {
 
-        Optional<Role> role = roleRepository.findByName(roleName);
-
-        if (role.isEmpty()) {
-            roleRepository.save(new Role(roleName));
-            System.out.println(roleName + " Created!");
+    private void createRoleIfNotExists(String roleName) {
+        if (roleRepository.findByName(roleName).isEmpty()) {
+            Role role = new Role();
+            role.setName(roleName);
+            roleRepository.save(role);
+            System.out.println("✅ Role created: " + roleName);
         }
-
     }
 }

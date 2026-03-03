@@ -16,7 +16,11 @@ public class Role {
     @Column(unique = true)
     private String name;
 
-    public Long getId() { return id; }
+    
+	public Role() {
+		// TODO Auto-generated constructor stub
+	}
+	public Long getId() { return id; }
     public String getName() { return name; }
 
     public void setId(Long id) { this.id = id; }
