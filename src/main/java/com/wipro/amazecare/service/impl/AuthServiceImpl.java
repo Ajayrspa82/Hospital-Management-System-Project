@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import com.wipro.amazecare.dto.LoginRequestDto;
 import com.wipro.amazecare.dto.LoginResponseDto;
 import com.wipro.amazecare.dto.RegisterRequestDto;
-import com.wipro.amazecare.dto.UserDto;
 import com.wipro.amazecare.entity.Role;
 import com.wipro.amazecare.entity.User;
 import com.wipro.amazecare.repository.RoleRepository;
 import com.wipro.amazecare.repository.UserRepository;
+import com.wipro.amazecare.service.AuthService;
 
 @Service
 public class AuthServiceImpl implements AuthService {

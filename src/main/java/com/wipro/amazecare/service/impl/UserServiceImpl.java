@@ -1,13 +1,14 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.UserDto;
 import com.wipro.amazecare.entity.User;
 import com.wipro.amazecare.repository.UserRepository;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.wipro.amazecare.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {

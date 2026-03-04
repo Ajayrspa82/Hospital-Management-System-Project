@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,12 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.ConsultationDto;
-import com.wipro.amazecare.dto.PrescriptionDto;
 import com.wipro.amazecare.dto.MedicalTestDto;
-import com.wipro.amazecare.entity.*;
+import com.wipro.amazecare.dto.PrescriptionDto;
+import com.wipro.amazecare.entity.Appointment;
+import com.wipro.amazecare.entity.Consultation;
+import com.wipro.amazecare.entity.Doctor;
+import com.wipro.amazecare.entity.MedicalTest;
+import com.wipro.amazecare.entity.Patient;
+import com.wipro.amazecare.entity.Prescription;
 import com.wipro.amazecare.exception.BadRequestException;
 import com.wipro.amazecare.exception.ResourceNotFoundException;
-import com.wipro.amazecare.repository.*;
+import com.wipro.amazecare.repository.AppointmentRepository;
+import com.wipro.amazecare.repository.ConsultationRepository;
+import com.wipro.amazecare.repository.DoctorRepository;
+import com.wipro.amazecare.repository.PatientRepository;
+import com.wipro.amazecare.service.ConsultationService;
 
 @Service
 public class ConsultationServiceImpl implements ConsultationService {
