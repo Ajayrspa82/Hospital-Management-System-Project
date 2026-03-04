@@ -38,5 +38,5 @@ public class LoginResponseDto {
 		this.message = message;
 	}
 
-    // getters & setters
+   
 }

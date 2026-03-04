@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +14,7 @@ import com.wipro.amazecare.exception.ResourceNotFoundException;
 import com.wipro.amazecare.repository.ConsultationRepository;
 import com.wipro.amazecare.repository.MedicalRecordRepository;
 import com.wipro.amazecare.repository.PatientRepository;
+import com.wipro.amazecare.service.MedicalRecordService;
 
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
