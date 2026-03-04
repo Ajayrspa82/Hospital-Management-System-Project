@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -11,6 +11,7 @@ import com.wipro.amazecare.repository.ConsultationRepository;
 import com.wipro.amazecare.repository.MedicalRecordRepository;
 import com.wipro.amazecare.repository.MedicalTestRepository;
 import com.wipro.amazecare.repository.PrescriptionRepository;
+import com.wipro.amazecare.service.ReportService;
 
 @Service
 public class ReportServiceImpl implements ReportService {

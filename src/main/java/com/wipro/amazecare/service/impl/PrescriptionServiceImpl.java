@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +12,7 @@ import com.wipro.amazecare.entity.Prescription;
 import com.wipro.amazecare.exception.ResourceNotFoundException;
 import com.wipro.amazecare.repository.ConsultationRepository;
 import com.wipro.amazecare.repository.PrescriptionRepository;
+import com.wipro.amazecare.service.PrescriptionService;
 
 @Service
 public class PrescriptionServiceImpl implements PrescriptionService {

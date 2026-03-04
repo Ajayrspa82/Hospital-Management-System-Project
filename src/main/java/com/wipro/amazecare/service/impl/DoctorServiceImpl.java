@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +11,7 @@ import com.wipro.amazecare.entity.Doctor;
 import com.wipro.amazecare.entity.Specialization;
 import com.wipro.amazecare.repository.DoctorRepository;
 import com.wipro.amazecare.repository.SpecializationRepository;
+import com.wipro.amazecare.service.DoctorService;
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
