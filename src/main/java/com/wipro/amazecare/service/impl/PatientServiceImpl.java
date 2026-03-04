@@ -1,4 +1,4 @@
-package com.wipro.amazecare.service;
+package com.wipro.amazecare.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.wipro.amazecare.dto.PatientDto;
 import com.wipro.amazecare.entity.Patient;
 import com.wipro.amazecare.repository.PatientRepository;
+import com.wipro.amazecare.service.PatientService;
 
 @Service
 public class PatientServiceImpl implements PatientService {
