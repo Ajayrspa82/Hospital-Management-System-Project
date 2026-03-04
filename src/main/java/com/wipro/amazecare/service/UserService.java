@@ -3,8 +3,10 @@ package com.wipro.amazecare.service;
 
 import java.util.List;
 
-import com.wipro.amazecare.dto.UserDto;
+import org.springframework.stereotype.Service;
 
+import com.wipro.amazecare.dto.UserDto;
+@Service
 public interface UserService {
 
     List<UserDto> getAllUsers();

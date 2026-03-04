@@ -1,5 +1,7 @@
 package com.wipro.amazecare.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UserDto {
 
     private Long id;
@@ -8,14 +10,17 @@ public class UserDto {
 
     public UserDto() {
     }
+   
 
     public Long getId() {
         return id;
     }
+    @NotBlank
 
     public String getEmail() {
         return email;
     }
+    @NotBlank
 
     public String getRole() {
         return role;

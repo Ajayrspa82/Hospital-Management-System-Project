@@ -21,11 +21,10 @@ public class User {
     private Long id;
 
     @Email
-    @NotBlank
+   
     @Column(unique = true)
     private String email;
 
-    @NotBlank
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)
