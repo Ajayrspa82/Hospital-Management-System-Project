@@ -16,6 +16,7 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Lo
 
     Optional<MedicalRecord> findByConsultation_ConsultationId(Long consultationId);
 
-    @Query("SELECT m FROM MedicalRecord m WHERE m.patient.patientId = :patientId ORDER BY m.recordId DESC LIMIT 1")
-    Optional<MedicalRecord> findLatestRecordByPatientId(Long patientId);
+    @Query("SELECT m FROM MedicalRecord m WHERE m.patient.patientId = :patientId ORDER BY m.recordId DESC")
+    List<MedicalRecord> findRecordsByPatientOrderByDesc(Long patientId);  
+    Optional<MedicalRecord> findLatestRecordByPatient_PatientId(Long patientId);
 }

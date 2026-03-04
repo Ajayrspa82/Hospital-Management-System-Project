@@ -30,7 +30,6 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public MedicalRecordDto createRecord(MedicalRecordDto dto) {
-
         Patient patient = patientRepository.findById(dto.getPatientId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Patient not found with id: " + dto.getPatientId()));
@@ -65,11 +64,15 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public MedicalRecordDto getMedicalRecordByPatient(Long patientId) {
 
-        MedicalRecord record = repository.findLatestRecordByPatientId(patientId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Medical record not found for patient id: " + patientId));
+        List<MedicalRecord> records =
+                repository.findRecordsByPatientOrderByDesc(patientId);
 
-        return mapToDto(record);
+        if (records.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Medical record not found for patient id: " + patientId);
+        }
+
+        return mapToDto(records.get(0)); // latest record
     }
 
     @Override
@@ -77,7 +80,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
         MedicalRecord record = repository.findByConsultation_ConsultationId(consultationId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Medical record not found for consultation id: " + consultationId));
+                        new ResourceNotFoundException(
+                                "Medical record not found for consultation id: " + consultationId));
 
         return mapToDto(record);
     }
@@ -87,7 +91,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
         MedicalRecord record = repository.findById(recordId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Medical record not found with id: " + recordId));
+                        new ResourceNotFoundException(
+                                "Medical record not found with id: " + recordId));
 
         if (dto.getNotes() != null && !dto.getNotes().isBlank()) {
             record.setNotes(dto.getNotes());
@@ -103,7 +108,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
         MedicalRecord record = repository.findById(recordId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Medical record not found with id: " + recordId));
+                        new ResourceNotFoundException(
+                                "Medical record not found with id: " + recordId));
 
         repository.delete(record);
     }
