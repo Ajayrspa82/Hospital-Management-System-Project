@@ -38,7 +38,6 @@ public class ConsultationServiceImpl implements ConsultationService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
-    // ================= CREATE =================
     @Override
     public ConsultationDto createConsultation(ConsultationDto dto) {
 
@@ -116,7 +115,6 @@ public class ConsultationServiceImpl implements ConsultationService {
         return mapToDto(consultation);
     }
 
-    // ================= GET BY ID =================
     @Override
     public ConsultationDto getConsultationById(Long id) {
 
@@ -165,7 +163,6 @@ public class ConsultationServiceImpl implements ConsultationService {
                 .collect(Collectors.toList());
     }
 
-    // ================= UPDATE =================
     @Override
     public ConsultationDto updateConsultation(Long id, ConsultationDto dto) {
 
@@ -196,7 +193,6 @@ public class ConsultationServiceImpl implements ConsultationService {
         return mapToDto(consultation);
     }
 
-    // ================= DELETE =================
     @Override
     public void deleteConsultation(Long id) {
 
@@ -207,7 +203,6 @@ public class ConsultationServiceImpl implements ConsultationService {
         repository.delete(consultation);
     }
 
-    // ================= DTO MAPPING =================
     private ConsultationDto mapToDto(Consultation c) {
 
         ConsultationDto dto = new ConsultationDto();
@@ -225,7 +220,6 @@ public class ConsultationServiceImpl implements ConsultationService {
         if (c.getAppointment() != null)
             dto.setAppointmentId(c.getAppointment().getAppointmentId());
 
-        // ===== PRESCRIPTION DTO WITH IDs =====
         if (c.getPrescriptions() != null) {
             List<PrescriptionDto> prescriptionDtos = c.getPrescriptions().stream().map(p -> {
                 PrescriptionDto pDto = new PrescriptionDto();
@@ -241,7 +235,6 @@ public class ConsultationServiceImpl implements ConsultationService {
             dto.setPrescriptions(prescriptionDtos);
         }
 
-        // ===== MEDICAL TEST DTO WITH IDs =====
         if (c.getRecommendedTests() != null) {
             List<MedicalTestDto> testDtos = c.getRecommendedTests().stream().map(t -> {
                 MedicalTestDto tDto = new MedicalTestDto();
