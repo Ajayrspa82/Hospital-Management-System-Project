@@ -11,5 +11,5 @@ public interface DoctorService {
     List<DoctorDto> getAllDoctors();
     DoctorDto updateDoctor(Long doctorId, DoctorDto doctorDto);
     void deleteDoctor(Long doctorId);
-	Object addDoctor(DoctorDto doctorDto);
+	
 }

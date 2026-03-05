@@ -16,10 +16,25 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
             .csrf(csrf -> csrf.disable())
+
+
+            .authorizeHttpRequests(auth -> auth
+
+                // Swagger
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+
+                // Auth APIs
+                .requestMatchers("/auth/**").permitAll()
+
+                // Frontend pages
 
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -29,6 +44,7 @@ public class SecurityConfig {
 
 
                 // 🔓 Frontend Public Pages
+
                 .requestMatchers(
                         "/",
                         "/index.html",
@@ -36,6 +52,20 @@ public class SecurityConfig {
                         "/register.html",
                         "/about.html",
                         "/contact.html",
+
+                        "/css/**",
+                        "/js/**"
+                ).permitAll()
+
+                // Admin APIs
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // All other APIs
+                .anyRequest().authenticated()
+            )
+
+            .httpBasic();   // enables username/password authentication
+
                         "/assets/**",
                         "/dashboards/**",
                         "/shared/**",
@@ -79,7 +109,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .httpBasic();
-     
+
 
         return http.build();
     }
@@ -91,7 +121,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+            AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
