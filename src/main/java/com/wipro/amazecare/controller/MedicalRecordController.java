@@ -21,43 +21,63 @@ public class MedicalRecordController {
         this.medicalRecordService = medicalRecordService;
     }
 
-    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT')")
+    // ADMIN, DOCTOR and PATIENT can view a patient's record
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','ADMIN')")
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<MedicalRecordDto> getMedicalRecordByPatient(
             @PathVariable Long patientId) {
-        MedicalRecordDto record = medicalRecordService.getMedicalRecordByPatient(patientId);
+
+        MedicalRecordDto record =
+                medicalRecordService.getMedicalRecordByPatient(patientId);
+
         return ResponseEntity.ok(record);
     }
 
-    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT')")
+    // ADMIN, DOCTOR and PATIENT can view all records
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','ADMIN')")
     @GetMapping("/patient/{patientId}/all")
     public ResponseEntity<List<MedicalRecordDto>> getAllRecordsByPatient(
             @PathVariable Long patientId) {
-        List<MedicalRecordDto> records = medicalRecordService.getRecordsByPatient(patientId);
+
+        List<MedicalRecordDto> records =
+                medicalRecordService.getRecordsByPatient(patientId);
+
         return ResponseEntity.ok(records);
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // ADMIN and DOCTOR can create medical records
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PostMapping
     public ResponseEntity<MedicalRecordDto> createMedicalRecord(
             @Valid @RequestBody MedicalRecordDto dto) {
-        MedicalRecordDto created = medicalRecordService.createRecord(dto);
+
+        MedicalRecordDto created =
+                medicalRecordService.createRecord(dto);
+
         return ResponseEntity.ok(created);
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // ADMIN and DOCTOR can update
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PutMapping("/{recordId}")
     public ResponseEntity<MedicalRecordDto> updateMedicalRecord(
             @PathVariable Long recordId,
             @Valid @RequestBody MedicalRecordDto dto) {
-        MedicalRecordDto updated = medicalRecordService.updateRecord(recordId, dto);
+
+        MedicalRecordDto updated =
+                medicalRecordService.updateRecord(recordId, dto);
+
         return ResponseEntity.ok(updated);
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // Only ADMIN can delete records
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{recordId}")
-    public ResponseEntity<String> deleteMedicalRecord(@PathVariable Long recordId) {
+    public ResponseEntity<String> deleteMedicalRecord(
+            @PathVariable Long recordId) {
+
         medicalRecordService.deleteRecord(recordId);
+
         return ResponseEntity.ok("Medical record deleted successfully");
     }
 }

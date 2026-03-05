@@ -1,75 +1,59 @@
 package com.wipro.amazecare.service.impl;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.Month;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wipro.amazecare.dto.ReportDto;
 import com.wipro.amazecare.repository.ConsultationRepository;
-import com.wipro.amazecare.repository.MedicalRecordRepository;
-import com.wipro.amazecare.repository.MedicalTestRepository;
-import com.wipro.amazecare.repository.PrescriptionRepository;
+import com.wipro.amazecare.repository.PatientRepository;
 import com.wipro.amazecare.service.ReportService;
-
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    private ConsultationRepository consultationRepository;
+    private final ConsultationRepository consultationRepository;
+    private final PatientRepository patientRepository;
 
-    @Autowired
-    private PrescriptionRepository prescriptionRepository;
+    public ReportServiceImpl(ConsultationRepository consultationRepository,
+                             PatientRepository patientRepository) {
 
-    @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
-
-    @Autowired
-    private MedicalTestRepository medicalTestRepository;
-
-    @Override
-    public ReportDto generateSystemReport() {
-        ReportDto report = new ReportDto();
-        report.setTotalConsultations(consultationRepository.count());
-        report.setTotalPrescriptions(prescriptionRepository.count());
-        report.setTotalMedicalRecords(medicalRecordRepository.count());
-        report.setTotalTests(medicalTestRepository.count());
-        return report;
+        this.consultationRepository = consultationRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Override
-    public ReportDto getMonthlyConsultationReport() {
+    public ReportDto getMonthlyConsultationReport(String month) {
+
         ReportDto report = new ReportDto();
-        YearMonth currentMonth = YearMonth.now();
 
-        LocalDate startDate = currentMonth.atDay(1);
-        LocalDate endDate = currentMonth.atEndOfMonth();
+        int monthNumber = Month.valueOf(month.toUpperCase()).getValue();
 
-        Long monthlyCount = consultationRepository
-                .countByConsultationDateBetween(startDate, endDate);
+        Long doctorConsultations =
+                consultationRepository.countByDoctorAndMonth(1L, monthNumber);
 
-        report.setTotalConsultations(monthlyCount);
-        report.setMonth(currentMonth.getMonth());
+        report.setDoctorConsultations(doctorConsultations);
+        report.setMonth(month.toUpperCase());
 
         return report;
     }
 
     @Override
     public ReportDto getDoctorSummary(Long doctorId) {
+
         ReportDto report = new ReportDto();
 
         Long doctorConsultations =
                 consultationRepository.countByDoctor_DoctorId(doctorId);
 
         report.setDoctorConsultations(doctorConsultations);
+        report.setMonth("ALL");
 
         return report;
     }
 
     @Override
     public Long getTotalPatients() {
-        return consultationRepository.countDistinctPatients();
+        return patientRepository.count();
     }
 
     @Override

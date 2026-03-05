@@ -2,6 +2,8 @@ package com.wipro.amazecare.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,8 @@ class ReportServiceSingleTest {
     @Autowired
     private SpecializationRepository specializationRepository;
 
+    private Doctor doctor;
+
     @BeforeEach
     void setUp() {
 
@@ -40,7 +44,7 @@ class ReportServiceSingleTest {
         specialization.setSpecializationName("General");
         specialization = specializationRepository.save(specialization);
 
-        Doctor doctor = new Doctor();
+        doctor = new Doctor();
         doctor.setName("Dr Test");
         doctor.setSpecialization(specialization);
         doctor = doctorRepository.save(doctor);
@@ -53,14 +57,16 @@ class ReportServiceSingleTest {
         consultation.setDoctor(doctor);
         consultation.setPatient(patient);
         consultation.setSymptoms("Fever");
+        consultation.setConsultationDate(LocalDateTime.now());
         consultationRepository.save(consultation);
     }
 
     @Test
-    void testGenerateSystemReport() {
-        ReportDto report = reportService.generateSystemReport();
+    void testMonthlyConsultationReport() {
+
+        ReportDto report = reportService.getMonthlyConsultationReport("MARCH");
 
         assertNotNull(report);
-        assertTrue(report.getTotalConsultations() >= 1);
+        assertTrue(report.getDoctorConsultations() >= 1);
     }
 }
