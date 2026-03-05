@@ -4,13 +4,15 @@ import com.wipro.amazecare.dto.ReportDto;
 
 public interface ReportService {
 
-    ReportDto generateSystemReport();
+    // Doctor consultations month wise
+    ReportDto getMonthlyConsultationReport(String month);
 
-    ReportDto getMonthlyConsultationReport();
-
+    // Doctor summary (total consultations for a doctor)
     ReportDto getDoctorSummary(Long doctorId);
 
+    // Total patients
     Long getTotalPatients();
 
+    // Total consultations
     Long getTotalConsultations();
 }

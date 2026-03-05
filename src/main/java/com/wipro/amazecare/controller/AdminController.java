@@ -36,12 +36,20 @@ public class AdminController {
     private AppointmentService appointmentService;
 
     // ================== DOCTOR MANAGEMENT ==================
-
     @PostMapping("/doctors")
-    public ResponseEntity<Object> addDoctor(@RequestBody DoctorDto doctorDto) {
-        return ResponseEntity.ok(doctorService.addDoctor(doctorDto));
+    public ResponseEntity<DoctorDto> addDoctor(@RequestBody DoctorDto doctorDto) {
+
+
+        DoctorDto savedDoctor = doctorService.createDoctor(doctorDto);
+
+        return ResponseEntity.ok(savedDoctor);
     }
 
+
+        DoctorDto savedDoctor = doctorService.createDoctor(doctorDto);
+
+        return ResponseEntity.ok(savedDoctor);
+    }
     @PutMapping("/doctors/{id}")
     public ResponseEntity<DoctorDto> updateDoctor(
             @PathVariable Long id,
@@ -73,7 +81,6 @@ public class AdminController {
         patientService.deletePatient(id);
         return ResponseEntity.ok("Patient deleted successfully");
     }
-
     // ================== APPOINTMENT MANAGEMENT ==================
 
     @GetMapping("/appointments")

@@ -21,23 +21,29 @@ public class PrescriptionController {
         this.prescriptionService = prescriptionService;
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // ADMIN and DOCTOR can add prescription
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PostMapping
     public ResponseEntity<PrescriptionDto> addPrescription(
             @Valid @RequestBody PrescriptionDto dto) {
         return ResponseEntity.ok(prescriptionService.addPrescription(dto));
     }
 
-    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT')")
+    // ADMIN, DOCTOR and PATIENT can view prescriptions
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','ADMIN')")
     @GetMapping("/consultation/{consultationId}")
     public ResponseEntity<List<PrescriptionDto>> getByConsultation(
             @PathVariable Long consultationId) {
+
         return ResponseEntity.ok(
                 prescriptionService.getPrescriptionsByConsultation(consultationId));
     }
-    @PreAuthorize("hasRole('DOCTOR')")
+
+    // ADMIN and DOCTOR can delete prescription
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePrescription(@PathVariable Long id) {
+
         prescriptionService.deletePrescription(id);
         return ResponseEntity.ok("Prescription deleted successfully");
     }
