@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +21,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
 
+
             .authorizeHttpRequests(auth -> auth
 
                 // Swagger
@@ -33,6 +35,16 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll()
 
                 // Frontend pages
+
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            .authorizeHttpRequests(auth -> auth
+
+
+                // 🔓 Frontend Public Pages
+
                 .requestMatchers(
                         "/",
                         "/index.html",
@@ -40,6 +52,7 @@ public class SecurityConfig {
                         "/register.html",
                         "/about.html",
                         "/contact.html",
+
                         "/css/**",
                         "/js/**"
                 ).permitAll()
@@ -52,6 +65,51 @@ public class SecurityConfig {
             )
 
             .httpBasic();   // enables username/password authentication
+
+                        "/assets/**",
+                        "/dashboards/**",
+                        "/shared/**",
+                        "/favicon.ico"
+                ).permitAll()
+
+                // 🔓 Swagger URLs
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+
+                // 🔓 Authentication APIs
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // 🔐 Admin APIs
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // 🔐 All other APIs need login
+                .anyRequest().authenticated()
+            )
+
+            .httpBasic(); // Using HTTP Basic Authentication
+
+                // ✅ Swagger allowed
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/index.html"
+                ).permitAll()
+
+                // ✅ Auth APIs allowed
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // 🔐 Admin role
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // 🔐 All other APIs require login
+                .anyRequest().authenticated()
+            )
+            .httpBasic();
+
 
         return http.build();
     }

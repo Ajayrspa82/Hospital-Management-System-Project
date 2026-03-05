@@ -21,33 +21,43 @@ public class MedicalTestController {
         this.medicalTestService = medicalTestService;
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // ADMIN and DOCTOR can add medical test
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PostMapping
     public ResponseEntity<MedicalTestDto> addMedicalTest(
             @Valid @RequestBody MedicalTestDto dto) {
+
         return ResponseEntity.ok(medicalTestService.createMedicalTest(dto));
     }
 
-    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT')")
+    // ADMIN, DOCTOR and PATIENT can view medical tests
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','ADMIN')")
     @GetMapping("/consultation/{consultationId}")
     public ResponseEntity<List<MedicalTestDto>> getByConsultation(
             @PathVariable Long consultationId) {
+
         return ResponseEntity.ok(
                 medicalTestService.getByConsultation(consultationId));
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // ADMIN and DOCTOR can update
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<MedicalTestDto> updateMedicalTest(
             @PathVariable Long id,
             @Valid @RequestBody MedicalTestDto dto) {
+
         return ResponseEntity.ok(
                 medicalTestService.updateMedicalTest(id, dto));
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+
+    // ADMIN and DOCTOR can delete
+
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMedicalTest(@PathVariable Long id) {
+
         medicalTestService.deleteMedicalTest(id);
         return ResponseEntity.ok("Medical test deleted successfully");
     }
