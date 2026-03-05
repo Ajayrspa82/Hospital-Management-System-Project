@@ -29,4 +29,11 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
     Long countByDoctorAndMonth(@Param("doctorId") Long doctorId,
                                @Param("month") int month);
 
+
+	    
+	    @Query("SELECT COUNT(DISTINCT c.patient) FROM Consultation c")
+	    Long countDistinctPatients();
+	    
+	    
+
 }

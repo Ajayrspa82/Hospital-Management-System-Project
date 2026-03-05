@@ -51,6 +51,9 @@ public class MedicalTestController {
                 medicalTestService.updateMedicalTest(id, dto));
     }
 
+
+    // ADMIN and DOCTOR can delete
+
     @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMedicalTest(@PathVariable Long id) {

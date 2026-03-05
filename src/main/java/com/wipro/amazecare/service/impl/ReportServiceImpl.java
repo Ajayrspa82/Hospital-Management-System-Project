@@ -17,6 +17,32 @@ public class ReportServiceImpl implements ReportService {
     public ReportServiceImpl(ConsultationRepository consultationRepository,
                              PatientRepository patientRepository) {
 
+
+    @Override
+    public ReportDto generateSystemReport() {
+
+        ReportDto report = new ReportDto();
+
+        report.setTotalConsultations(consultationRepository.count());
+        report.setTotalPrescriptions(prescriptionRepository.count());
+        report.setTotalMedicalRecords(medicalRecordRepository.count());
+        report.setTotalTests(medicalTestRepository.count());
+
+        // Fix for null values
+        report.setTotalPatients(consultationRepository.countDistinctPatients());
+        report.setDoctorConsultations(0L);
+        report.setMonth(YearMonth.now().getMonth());
+
+        return report;
+    }
+
+    @Override
+    public ReportDto getMonthlyConsultationReport() {
+
+        ReportDto report = new ReportDto();
+
+        YearMonth currentMonth = YearMonth.now();
+
         this.consultationRepository = consultationRepository;
         this.patientRepository = patientRepository;
     }
@@ -26,10 +52,16 @@ public class ReportServiceImpl implements ReportService {
 
         ReportDto report = new ReportDto();
 
+
         int monthNumber = Month.valueOf(month.toUpperCase()).getValue();
+
+
+        Long monthlyCount =
+                consultationRepository.countByConsultationDateBetween(startDate, endDate);
 
         Long doctorConsultations =
                 consultationRepository.countByDoctorAndMonth(1L, monthNumber);
+
 
         report.setDoctorConsultations(doctorConsultations);
         report.setMonth(month.toUpperCase());
@@ -46,7 +78,11 @@ public class ReportServiceImpl implements ReportService {
                 consultationRepository.countByDoctor_DoctorId(doctorId);
 
         report.setDoctorConsultations(doctorConsultations);
+
+        report.setMonth(YearMonth.now().getMonth());
+
         report.setMonth("ALL");
+
 
         return report;
     }

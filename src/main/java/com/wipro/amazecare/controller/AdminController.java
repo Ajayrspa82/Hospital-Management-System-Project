@@ -39,6 +39,13 @@ public class AdminController {
     @PostMapping("/doctors")
     public ResponseEntity<DoctorDto> addDoctor(@RequestBody DoctorDto doctorDto) {
 
+
+        DoctorDto savedDoctor = doctorService.createDoctor(doctorDto);
+
+        return ResponseEntity.ok(savedDoctor);
+    }
+
+
         DoctorDto savedDoctor = doctorService.createDoctor(doctorDto);
 
         return ResponseEntity.ok(savedDoctor);
@@ -74,7 +81,6 @@ public class AdminController {
         patientService.deletePatient(id);
         return ResponseEntity.ok("Patient deleted successfully");
     }
-
     // ================== APPOINTMENT MANAGEMENT ==================
 
     @GetMapping("/appointments")
