@@ -22,4 +22,6 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
 	    
 	    @Query("SELECT COUNT(DISTINCT c.patient) FROM Consultation c")
 	    Long countDistinctPatients();
+	    
+	    
 }

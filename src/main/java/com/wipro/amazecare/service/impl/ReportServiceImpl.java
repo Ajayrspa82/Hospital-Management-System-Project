@@ -30,24 +30,34 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportDto generateSystemReport() {
+
         ReportDto report = new ReportDto();
+
         report.setTotalConsultations(consultationRepository.count());
         report.setTotalPrescriptions(prescriptionRepository.count());
         report.setTotalMedicalRecords(medicalRecordRepository.count());
         report.setTotalTests(medicalTestRepository.count());
+
+        // Fix for null values
+        report.setTotalPatients(consultationRepository.countDistinctPatients());
+        report.setDoctorConsultations(0L);
+        report.setMonth(YearMonth.now().getMonth());
+
         return report;
     }
 
     @Override
     public ReportDto getMonthlyConsultationReport() {
+
         ReportDto report = new ReportDto();
+
         YearMonth currentMonth = YearMonth.now();
 
         LocalDate startDate = currentMonth.atDay(1);
         LocalDate endDate = currentMonth.atEndOfMonth();
 
-        Long monthlyCount = consultationRepository
-                .countByConsultationDateBetween(startDate, endDate);
+        Long monthlyCount =
+                consultationRepository.countByConsultationDateBetween(startDate, endDate);
 
         report.setTotalConsultations(monthlyCount);
         report.setMonth(currentMonth.getMonth());
@@ -57,12 +67,14 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportDto getDoctorSummary(Long doctorId) {
+
         ReportDto report = new ReportDto();
 
         Long doctorConsultations =
                 consultationRepository.countByDoctor_DoctorId(doctorId);
 
         report.setDoctorConsultations(doctorConsultations);
+        report.setMonth(YearMonth.now().getMonth());
 
         return report;
     }
