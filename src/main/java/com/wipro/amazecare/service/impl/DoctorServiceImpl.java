@@ -113,5 +113,9 @@ public class DoctorServiceImpl implements DoctorService {
         return doctor;
     }
 
-	
+	@Override
+	public Object addDoctor(DoctorDto doctorDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
