@@ -36,7 +36,6 @@ public class AdminController {
     private AppointmentService appointmentService;
 
     // ================== DOCTOR MANAGEMENT ==================
-
     @PostMapping("/doctors")
     public ResponseEntity<DoctorDto> addDoctor(@RequestBody DoctorDto doctorDto) {
 
@@ -44,7 +43,6 @@ public class AdminController {
 
         return ResponseEntity.ok(savedDoctor);
     }
-
     @PutMapping("/doctors/{id}")
     public ResponseEntity<DoctorDto> updateDoctor(
             @PathVariable Long id,

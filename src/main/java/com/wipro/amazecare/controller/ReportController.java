@@ -1,7 +1,5 @@
 package com.wipro.amazecare.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,30 +18,27 @@ public class ReportController {
         this.reportService = reportService;
     }
 
+    // Doctor consultations month wise
     @GetMapping("/consultations/monthly")
-    public ResponseEntity<ReportDto> getMonthlyConsultations() {
-        return ResponseEntity.ok(reportService.getMonthlyConsultationReport());
+    public ResponseEntity<ReportDto> getMonthlyConsultations(@RequestParam String month) {
+        return ResponseEntity.ok(reportService.getMonthlyConsultationReport(month));
     }
 
+    // Doctor summary
     @GetMapping("/doctor/{doctorId}/summary")
     public ResponseEntity<ReportDto> getDoctorSummary(@PathVariable Long doctorId) {
         return ResponseEntity.ok(reportService.getDoctorSummary(doctorId));
     }
 
+    // Total patients
     @GetMapping("/patients/total")
     public ResponseEntity<Long> getTotalPatients() {
         return ResponseEntity.ok(reportService.getTotalPatients());
     }
 
+    // Total consultations
     @GetMapping("/consultations/total")
     public ResponseEntity<Long> getTotalConsultations() {
         return ResponseEntity.ok(reportService.getTotalConsultations());
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<ReportDto> createReport(@Valid @RequestBody ReportDto reportDto) {
-        // The service method should handle saving/processing the report
-        ReportDto savedReport = reportService.generateSystemReport(); // example; replace with real save
-        return ResponseEntity.ok(savedReport);
     }
 }

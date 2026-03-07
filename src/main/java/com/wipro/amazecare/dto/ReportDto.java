@@ -1,6 +1,8 @@
 package com.wipro.amazecare.dto;
 
 import java.time.Month;
+
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class ReportDto {
@@ -23,7 +25,8 @@ public class ReportDto {
     @NotNull(message = "Doctor consultations cannot be null")
     private Long doctorConsultations;
 
-    private Month month; 
+    @NotBlank(message = "Month cannot be blank")
+    private String month;
 
     public Long getTotalConsultations() {
         return totalConsultations;
@@ -73,11 +76,13 @@ public class ReportDto {
         this.doctorConsultations = doctorConsultations;
     }
 
-    public Month getMonth() {
+    public String getMonth() {
         return month;
     }
 
-    public void setMonth(Month month) {
+    public void setMonth(String month) {
         this.month = month;
     }
+
+	
 }

@@ -15,43 +15,30 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
             .csrf(csrf -> csrf.disable())
-
             .authorizeHttpRequests(auth -> auth
 
-                // Swagger
+                // ✅ Swagger allowed
                 .requestMatchers(
-                        "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "/swagger-ui.html"
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/index.html"
                 ).permitAll()
 
-                // Auth APIs
-                .requestMatchers("/auth/**").permitAll()
+                // ✅ Auth APIs allowed
+                .requestMatchers("/api/auth/**").permitAll()
 
-                // Frontend pages
-                .requestMatchers(
-                        "/",
-                        "/index.html",
-                        "/login.html",
-                        "/register.html",
-                        "/about.html",
-                        "/contact.html",
-                        "/css/**",
-                        "/js/**"
-                ).permitAll()
-
-                // Admin APIs
+                // 🔐 Admin role
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // All other APIs
+                // 🔐 All other APIs require login
                 .anyRequest().authenticated()
             )
-
-            .httpBasic();   // enables username/password authentication
+            .httpBasic();
 
         return http.build();
     }
@@ -63,7 +50,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

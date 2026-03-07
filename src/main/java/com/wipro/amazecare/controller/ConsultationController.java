@@ -21,38 +21,48 @@ public class ConsultationController {
         this.consultationService = consultationService;
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // Only DOCTOR or ADMIN can create consultation
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PostMapping
     public ResponseEntity<ConsultationDto> createConsultation(
             @Valid @RequestBody ConsultationDto dto) {
         return ResponseEntity.ok(consultationService.createConsultation(dto));
     }
 
+    // PATIENT, DOCTOR, ADMIN can view
+    @PreAuthorize("hasAnyRole('PATIENT','DOCTOR','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ConsultationDto> getConsultation(@PathVariable Long id) {
         return ResponseEntity.ok(consultationService.getConsultationById(id));
     }
 
+    // PATIENT, DOCTOR, ADMIN
+    @PreAuthorize("hasAnyRole('PATIENT','DOCTOR','ADMIN')")
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<ConsultationDto>> getByPatient(
             @PathVariable Long patientId) {
         return ResponseEntity.ok(consultationService.getByPatient(patientId));
     }
 
+    // PATIENT, DOCTOR, ADMIN
+    @PreAuthorize("hasAnyRole('PATIENT','DOCTOR','ADMIN')")
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<List<ConsultationDto>> getByDoctor(
             @PathVariable Long doctorId) {
         return ResponseEntity.ok(consultationService.getByDoctor(doctorId));
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    // Only DOCTOR or ADMIN
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ConsultationDto> updateConsultation(
             @PathVariable Long id,
             @Valid @RequestBody ConsultationDto dto) {
         return ResponseEntity.ok(consultationService.updateConsultation(id, dto));
     }
-    @PreAuthorize("hasRole('DOCTOR')")
+
+    // Only ADMIN can delete
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteConsultation(@PathVariable Long id) {
         consultationService.deleteConsultation(id);
