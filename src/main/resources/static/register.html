@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><title>Amaze Care • Register</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" href="/favicon.ico"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/app.css"/>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.7.8/dist/axios.min.js"></script>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/auth.js"></script>
+<script src="/assets/js/shell.js"></script>
+</head>
+<body>
+<div id="app-navbar"></div>
+<script>Shell.pageBg('/assets/img/auth-bg.jpeg', true); Shell.boot();</script>
+<section class="auth-wrap">
+  <div class="container">
+    <div class="glass-card auth-card p-4 p-lg-5">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <span class="info-chip mb-3">Patient onboarding</span>
+          <div class="section-title">Create patient account</div>
+        </div>
+        <div class="col-lg-7">
+          <form id="regForm" class="row g-3" novalidate>
+            <div class="col-md-6"><label class="form-label">Full Name</label><input class="form-control" id="fullName" required placeholder="Your full name"></div>
+            <div class="col-md-6"><label class="form-label">Mobile Number</label><input class="form-control" id="mobileNumber" type="tel" inputmode="numeric" maxlength="10" required placeholder="10-digit mobile" pattern="^[0-9]{10}$"></div>
+            <div class="col-md-6"><label class="form-label">Date of Birth</label><input class="form-control" id="dob" type="date" required></div>
+            <div class="col-md-6"><label class="form-label">Gender</label><select class="form-select" id="gender" required><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+            <div class="col-12"><label class="form-label">Medical History</label><textarea class="form-control" id="medicalHistory" placeholder="Any known conditions, allergies, etc."></textarea></div>
+            <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" id="email" type="email" required placeholder="name@example.com"></div>
+            <div class="col-md-6"><label class="form-label">Password</label><input class="form-control" id="password" type="password" required minlength="6" placeholder="Minimum 6 characters"><div class="small-muted mt-1" id="pwStrength"></div></div>
+            <div class="col-12"><button class="btn btn-ac w-100 py-3">Register & Continue</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div id="app-footer"></div>
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const pw = document.getElementById('password');
+const mobileEl = document.getElementById('mobileNumber');
+pw.addEventListener('input', () => {
+  const v = pw.value || '';
+  let s = 'Weak';
+  if (v.length >= 10 && /[^A-Za-z0-9]/.test(v) && /[A-Z]/.test(v)) s = 'Strong';
+  else if (v.length >= 8) s = 'Medium';
+  document.getElementById('pwStrength').textContent = 'Password strength: ' + s;
+});
+mobileEl.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g,'').slice(0,10));
+document.getElementById('regForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const mobile = mobileEl.value.trim();
+  if (!/^[0-9]{10}$/.test(mobile)) return Api.toast('Enter a valid 10-digit mobile number.', 'error');
+  try {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    await Auth.register({ email, password, role:'ROLE_PATIENT' });
+    await Auth.login(email, password);
+    await Api.post('/api/patients', {
+      fullName: document.getElementById('fullName').value.trim(),
+      dateOfBirth: document.getElementById('dob').value,
+      gender: document.getElementById('gender').value,
+      mobileNumber: mobile,
+      email,
+      medicalHistory: document.getElementById('medicalHistory').value.trim()
+    });
+    Api.toast('Registration completed successfully.', 'success');
+    setTimeout(() => location.href='/dashboards/patient.html', 600);
+  } catch (err) {
+    Api.toast(Api.friendlyError(err), 'error');
+  }
+});
+</script>
+</body></html>

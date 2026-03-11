@@ -69,7 +69,7 @@ public class MedicalRecordController {
 
         return ResponseEntity.ok(updated);
     }
-
+    
     // Only ADMIN can delete records
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{recordId}")

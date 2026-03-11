@@ -18,7 +18,7 @@ import com.wipro.amazecare.repository.*;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-class ReportServiceSingleTest {
+class ReportServiceTest {
 
     @Autowired
     private ReportService reportService;
